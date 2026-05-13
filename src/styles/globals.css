@@ -113,3 +113,33 @@ button {
     padding-top: 5rem;
   }
 }
+
+/* Campaign Log Styles */
+.log-entry {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.stat-icon.success { color: var(--success); }
+.stat-icon.error { color: var(--error); }
+.stat-icon.info { color: var(--accent); }
+
+button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.stats-info {
+  font-size: 0.9rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Users, 
   UserPlus, 
@@ -8,23 +8,63 @@ import {
   MoreVertical, 
   FileUp, 
   Trash2,
-  Mail
+  Mail,
+  Download
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useContacts } from '../../lib/ContactContext';
 
 const Contacts = () => {
-  const [contacts, setContacts] = useState([
-    { id: 1, name: 'João Silva', phone: '5511999999999', status: 'Ativo' },
-    { id: 2, name: 'Maria Souza', phone: '5511888888888', status: 'Ativo' },
-    { id: 3, name: 'Pedro Santos', phone: '5511777777777', status: 'Inativo' },
-  ]);
-
+  const { contacts, addContacts, deleteContact, clearContacts } = useContacts();
   const [searchTerm, setSearchTerm] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredContacts = contacts.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.phone.includes(searchTerm)
   );
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n');
+      const newContacts: any[] = [];
+
+      lines.forEach((line, index) => {
+        if (index === 0 && (line.toLowerCase().includes('nome') || line.toLowerCase().includes('phone'))) return; // Skip header
+        
+        const [name, phone] = line.split(',').map(s => s.trim());
+        if (name && phone) {
+          newContacts.push({
+            name,
+            phone: phone.replace(/\D/g, ''), // Remove non-numeric
+            status: 'Ativo'
+          });
+        }
+      });
+
+      if (newContacts.length > 0) {
+        addContacts(newContacts);
+        alert(`${newContacts.length} contatos importados com sucesso!`);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // Reset input
+  };
+
+  const downloadExample = () => {
+    const content = "nome,telefone\nJoao Silva,5511999999999\nMaria Souza,5511888888888";
+    const blob = new Blob([content], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'exemplo_contatos.csv';
+    a.click();
+  };
 
   return (
     <div className="contacts-page animate-fade-in">
@@ -34,7 +74,18 @@ const Contacts = () => {
           <p>Importe e organize seus clientes para envios em massa.</p>
         </div>
         <div className="header-actions">
-          <button className="btn-secondary">
+          <input 
+            type="file" 
+            accept=".csv,.txt" 
+            style={{ display: 'none' }} 
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+          />
+          <button className="btn-secondary" onClick={downloadExample}>
+            <Download size={18} />
+            Exemplo
+          </button>
+          <button className="btn-secondary" onClick={() => fileInputRef.current?.click()}>
             <FileUp size={18} />
             Importar CSV
           </button>
@@ -49,10 +100,15 @@ const Contacts = () => {
         <Search size={20} color="rgba(255,255,255,0.4)" />
         <input 
           type="text" 
-          placeholder="Pesquisar por nome ou telefone..." 
+          placeholder="Pesquisar por nome ou telefone (apenas números)..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        {contacts.length > 0 && (
+          <button onClick={clearContacts} className="btn-clear" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' }}>
+            Limpar Lista
+          </button>
+        )}
       </div>
 
       <div className="contacts-table-container glass">
@@ -66,34 +122,42 @@ const Contacts = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredContacts.map((contact, index) => (
-              <motion.tr 
-                key={contact.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <td>
-                  <div className="user-info">
-                    <div className="user-avatar">{contact.name.charAt(0)}</div>
-                    <span>{contact.name}</span>
-                  </div>
+            {filteredContacts.length === 0 ? (
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.2)' }}>
+                  Nenhum contato encontrado. Importe um arquivo CSV para começar.
                 </td>
-                <td>{contact.phone}</td>
-                <td>
-                  <span className={`status-pill ${contact.status.toLowerCase()}`}>
-                    {contact.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="table-actions">
-                    <button title="Enviar Mensagem"><Mail size={16} /></button>
-                    <button title="Excluir"><Trash2 size={16} /></button>
-                    <button><MoreVertical size={16} /></button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
+              </tr>
+            ) : (
+              filteredContacts.map((contact, index) => (
+                <motion.tr 
+                  key={contact.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: Math.min(index * 0.05, 1) }}
+                >
+                  <td>
+                    <div className="user-info">
+                      <div className="user-avatar">{contact.name.charAt(0)}</div>
+                      <span>{contact.name}</span>
+                    </div>
+                  </td>
+                  <td>{contact.phone}</td>
+                  <td>
+                    <span className={`status-pill ${contact.status.toLowerCase()}`}>
+                      {contact.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="table-actions">
+                      <button title="Enviar Mensagem"><Mail size={16} /></button>
+                      <button title="Excluir" onClick={() => deleteContact(contact.id)}><Trash2 size={16} /></button>
+                      <button><MoreVertical size={16} /></button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

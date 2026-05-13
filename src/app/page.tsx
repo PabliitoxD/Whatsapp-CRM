@@ -9,18 +9,20 @@ import {
   Smartphone,
   QrCode,
   ShieldCheck,
-  RefreshCw
+  RefreshCw,
+  Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
+import { useContacts } from '../lib/ContactContext';
 
 const Dashboard = () => {
+  const { contacts } = useContacts();
   const [wsStatus, setWsStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const socketRef = useRef<any>(null);
   
   useEffect(() => {
-    // Connect to the background WhatsApp server
     socketRef.current = io('http://localhost:3001');
 
     socketRef.current.on('status', (status: any) => {
@@ -44,23 +46,19 @@ const Dashboard = () => {
   };
 
   const stats = [
-    { title: 'Total Contatos', value: '1,284', icon: <Users />, color: '#8b5cf6' },
-    { title: 'Envios Hoje', value: '450', icon: <Send />, color: '#00f2fe' },
-    { title: 'Entregues', value: '98.2%', icon: <CheckCircle />, color: '#10b981' },
-    { title: 'Pendentes', value: '12', icon: <Clock />, color: '#f59e0b' },
+    { title: 'Total Contatos', value: contacts.length.toLocaleString(), icon: <Users />, color: '#8b5cf6' },
+    { title: 'Conexão', value: wsStatus === 'connected' ? 'Ativa' : 'Inativa', icon: <Zap />, color: wsStatus === 'connected' ? '#10b981' : '#ef4444' },
+    { title: 'Listas', value: contacts.length > 0 ? '1' : '0', icon: <CheckCircle />, color: '#00f2fe' },
+    { title: 'Aguardando', value: '0', icon: <Clock />, color: '#f59e0b' },
   ];
 
   return (
     <div className="dashboard-page animate-fade-in">
       <header className="page-header">
         <div>
-          <h1>Bem-vindo, <span className="gradient-text">Usuário</span></h1>
-          <p>Confira o status das suas campanhas e conexões.</p>
+          <h1>Painel de <span className="gradient-text">Controle</span></h1>
+          <p>Gerencie sua conexão e acompanhe o crescimento da sua base.</p>
         </div>
-        <button className="btn-primary gradient-bg">
-          <Send size={18} />
-          Nova Campanha
-        </button>
       </header>
 
       <div className="stats-grid">
@@ -114,7 +112,7 @@ const Dashboard = () => {
             ) : wsStatus === 'connecting' ? (
               <div className="qr-loading">
                 <div className="spinner"></div>
-                <p>Gerando QR Code...</p>
+                <p>Iniciando WhatsApp...</p>
               </div>
             ) : (
               <div className="qr-success">
@@ -131,20 +129,27 @@ const Dashboard = () => {
 
         <div className="recent-activity glass">
           <div className="card-header">
-            <h3>Atividade Recente</h3>
+            <h3>Dicas de Uso</h3>
           </div>
           <div className="activity-list">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="activity-item">
-                <div className="activity-icon">
-                  <Send size={16} />
-                </div>
-                <div className="activity-details">
-                  <p>Campanha <strong>Promoção de Maio</strong> finalizada</p>
-                  <span>há 2 horas</span>
-                </div>
+            <div className="activity-item">
+              <div className="activity-icon"><CheckCircle size={16} /></div>
+              <div className="activity-details">
+                <p>Use o campo <strong>{{'{{nome}}'}}</strong> para personalizar suas mensagens.</p>
               </div>
-            ))}
+            </div>
+            <div className="activity-item">
+              <div className="activity-icon"><Clock size={16} /></div>
+              <div className="activity-details">
+                <p>Mantenha um intervalo de pelo menos 30s entre os envios.</p>
+              </div>
+            </div>
+            <div className="activity-item">
+              <div className="activity-icon"><Users size={16} /></div>
+              <div className="activity-details">
+                <p>Importe arquivos CSV com as colunas <strong>nome, telefone</strong>.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import '../styles/globals.css';
 import Sidebar from '../components/Sidebar';
+import { ContactProvider } from '../lib/ContactContext';
 
 export const metadata: Metadata = {
   title: 'WhatsApp CRM Master',
@@ -15,12 +16,14 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <div className="app-container">
-          <Sidebar />
-          <main className="main-content">
-            {children}
-          </main>
-        </div>
+        <ContactProvider>
+          <div className="app-container">
+            <Sidebar />
+            <main className="main-content">
+              {children}
+            </main>
+          </div>
+        </ContactProvider>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Send, 
   Users, 
@@ -8,20 +8,91 @@ import {
   Clock,
   Play,
   Pause,
-  AlertCircle
+  AlertCircle,
+  Terminal
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useContacts } from '../../lib/ContactContext';
+import { io, Socket } from 'socket.io-client';
 
 const Campaigns = () => {
+  const { contacts } = useContacts();
   const [message, setMessage] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('');
   const [delay, setDelay] = useState(30);
+  const [isRunning, setIsRunning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [stats, setStats] = useState({ total: 0, success: 0, error: 0 });
+  const [logs, setLogs] = useState<string[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-  const stats = [
-    { label: 'Total de Envios', value: '0', icon: <Send size={16} /> },
-    { label: 'Sucesso', value: '0', icon: <Clock size={16} /> },
-    { label: 'Erros', value: '0', icon: <AlertCircle size={16} /> },
-  ];
+  useEffect(() => {
+    const newSocket = io('http://localhost:3001');
+    setSocket(newSocket);
+
+    newSocket.on('message-sent', (data) => {
+      if (data.success) {
+        setStats(prev => ({ ...prev, success: prev.success + 1 }));
+        addLog(`✅ Sucesso para: ${data.to}`);
+      } else {
+        setStats(prev => ({ ...prev, error: prev.error + 1 }));
+        addLog(`❌ Erro para ${data.to}: ${data.error}`);
+      }
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  const addLog = (msg: string) => {
+    setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 50));
+  };
+
+  const replaceTags = (text: string, contact: any) => {
+    return text
+      .replace(/{{nome}}/g, contact.name)
+      .replace(/{{telefone}}/g, contact.phone);
+  };
+
+  const startCampaign = async () => {
+    if (contacts.length === 0) {
+      alert('Importe contatos primeiro!');
+      return;
+    }
+    if (!message) {
+      alert('Digite uma mensagem!');
+      return;
+    }
+    if (!socket) {
+      alert('Servidor WhatsApp não conectado!');
+      return;
+    }
+
+    setIsRunning(true);
+    setStats({ total: contacts.length, success: 0, error: 0 });
+    setProgress(0);
+    addLog('🚀 Iniciando campanha...');
+
+    for (let i = 0; i < contacts.length; i++) {
+      if (!isRunning && i > 0) break; // Allow stop (needs more logic for full pause)
+
+      const contact = contacts[i];
+      const personalizedMessage = replaceTags(message, contact);
+      
+      addLog(`⏳ Enviando para ${contact.name}...`);
+      socket.emit('send-message', { to: contact.phone, message: personalizedMessage });
+
+      setProgress(Math.round(((i + 1) / contacts.length) * 100));
+
+      if (i < contacts.length - 1) {
+        addLog(`💤 Aguardando ${delay}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay * 1000));
+      }
+    }
+
+    setIsRunning(false);
+    addLog('🏁 Campanha finalizada!');
+  };
 
   return (
     <div className="campaigns-page animate-fade-in">
@@ -35,13 +106,10 @@ const Campaigns = () => {
       <div className="campaign-grid">
         <div className="campaign-form glass">
           <div className="form-section">
-            <label><Users size={16} /> Selecionar Público</label>
-            <select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)}>
-              <option value="">Selecione um grupo ou lista...</option>
-              <option value="all">Todos os Contatos (1,284)</option>
-              <option value="leads">Novos Leads (150)</option>
-              <option value="vip">Clientes VIP (45)</option>
-            </select>
+            <label><Users size={16} /> Público Alvo</label>
+            <div className="stats-info">
+              <strong>{contacts.length}</strong> contatos carregados
+            </div>
           </div>
 
           <div className="form-section">
@@ -53,7 +121,7 @@ const Campaigns = () => {
                 onChange={(e) => setMessage(e.target.value)}
               />
               <div className="variables-hint">
-                Variáveis: <code>{'{{nome}}'}</code>, <code>{'{{telefone}}'}</code>
+                Tags disponíveis: <code>{'{{nome}}'}</code>, <code>{'{{telefone}}'}</code>
               </div>
             </div>
           </div>
@@ -64,15 +132,19 @@ const Campaigns = () => {
               type="number" 
               value={delay} 
               onChange={(e) => setDelay(parseInt(e.target.value))}
-              min="5"
+              min="1"
             />
-            <p className="hint">Recomendamos pelo menos 20-30 segundos para evitar bloqueios.</p>
+            <p className="hint">Mantenha entre 30-60s para maior segurança.</p>
           </div>
 
           <div className="form-actions">
-            <button className="btn-primary gradient-bg full-width">
+            <button 
+              className={`btn-primary gradient-bg full-width ${isRunning ? 'disabled' : ''}`}
+              onClick={startCampaign}
+              disabled={isRunning}
+            >
               <Play size={18} />
-              Iniciar Campanha
+              {isRunning ? 'Campanha em Execução...' : 'Iniciar Campanha'}
             </button>
           </div>
         </div>
@@ -81,32 +153,52 @@ const Campaigns = () => {
           <div className="status-overview glass">
             <h3>Progresso da Campanha</h3>
             <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: '0%' }}></div>
+              <div className="progress-bar" style={{ width: `${progress}%` }}></div>
             </div>
             <div className="progress-stats">
-              <span>0% Completo</span>
-              <span>0 / 0</span>
+              <span>{progress}% Completo</span>
+              <span>{stats.success + stats.error} / {contacts.length}</span>
             </div>
           </div>
 
           <div className="stats-mini-grid">
-            {stats.map((stat, i) => (
-              <div key={i} className="stat-mini glass">
-                <div className="stat-icon">{stat.icon}</div>
-                <div className="stat-details">
-                  <span className="stat-label">{stat.label}</span>
-                  <span className="stat-val">{stat.value}</span>
-                </div>
+            <div className="stat-mini glass">
+              <div className="stat-icon success"><Send size={16} /></div>
+              <div className="stat-details">
+                <span className="stat-label">Sucesso</span>
+                <span className="stat-val">{stats.success}</span>
               </div>
-            ))}
+            </div>
+            <div className="stat-mini glass">
+              <div className="stat-icon error"><AlertCircle size={16} /></div>
+              <div className="stat-details">
+                <span className="stat-label">Erros</span>
+                <span className="stat-val">{stats.error}</span>
+              </div>
+            </div>
+            <div className="stat-mini glass">
+              <div className="stat-icon info"><Clock size={16} /></div>
+              <div className="stat-details">
+                <span className="stat-label">Restante</span>
+                <span className="stat-val">{contacts.length - (stats.success + stats.error)}</span>
+              </div>
+            </div>
           </div>
 
           <div className="live-log glass">
-            <h3>Log de Envio em Tempo Real</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Terminal size={16} /> Log em Tempo Real
+            </h3>
             <div className="log-container">
-              <div className="log-placeholder">
-                Nenhuma campanha ativa no momento.
-              </div>
+              {logs.length === 0 ? (
+                <div className="log-placeholder">
+                  Nenhuma atividade registrada.
+                </div>
+              ) : (
+                logs.map((log, i) => (
+                  <div key={i} className="log-entry">{log}</div>
+                ))
+              )}
             </div>
           </div>
         </div>
