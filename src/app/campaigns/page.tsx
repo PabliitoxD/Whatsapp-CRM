@@ -17,7 +17,7 @@ import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
 
 const Campaigns = () => {
-  const { contacts, templates, instances, campaigns, addCampaign, updateCampaignStats } = useContacts();
+  const { contacts, templates, instances, campaigns, customTags, addCampaign, updateCampaignStats } = useContacts();
   const [campaignName, setCampaignName] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [selectedInstanceId, setSelectedInstanceId] = useState('');
