@@ -8,7 +8,9 @@ import {
   Search,
   MoreVertical,
   Mail,
-  UserPlus
+  UserPlus,
+  Filter,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useContacts } from '../../lib/ContactContext';
@@ -27,9 +29,10 @@ const Contacts = () => {
       const lines = text.split('\n');
       const newContacts = lines
         .map(line => {
-          const [name, phone] = line.split(',').map(s => s.trim());
+          const parts = line.split(',');
+          const name = parts[0]?.trim();
+          const phone = parts[1]?.trim();
           if (name && phone) {
-            // Clean phone number (remove non-digits)
             const cleanPhone = phone.replace(/\D/g, '');
             return { name, phone: cleanPhone, status: 'Ativo' as const };
           }
@@ -49,76 +52,98 @@ const Contacts = () => {
 
   return (
     <div className="contacts-page animate-fade-in">
-      <header className="page-header">
+      <header className="page-header flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1>Gestão de <span className="gradient-text">Contatos</span></h1>
-          <p>Total de {contacts.length} contatos na sua base.</p>
+          <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+            Audiência <span className="gradient-text">Master</span>
+          </motion.h1>
+          <p>Gerencie sua base de {contacts.length} leads qualificados.</p>
         </div>
-        <div className="header-actions">
-          <button className="btn-secondary" onClick={clearContacts}>
+        <div className="header-actions flex gap-3">
+          <button className="btn-secondary flex items-center gap-2" onClick={clearContacts}>
             <Trash2 size={18} />
-            Limpar Base
+            <span className="hidden sm:inline">Limpar Base</span>
           </button>
-          <label className="btn-primary gradient-bg cursor-pointer">
+          <label className="btn-primary gradient-bg cursor-pointer flex items-center gap-2">
             <Upload size={18} />
-            Importar CSV
+            <span>Importar Leads</span>
             <input type="file" hidden accept=".csv,.txt" onChange={handleFileUpload} />
           </label>
         </div>
       </header>
 
-      <div className="search-bar glass">
-        <Search size={20} className="text-muted" />
-        <input 
-          type="text" 
-          placeholder="Buscar contatos por nome ou telefone..." 
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="search-bar glass flex-1 flex items-center px-6 py-4 gap-4">
+          <Search size={20} className="text-white/20" />
+          <input 
+            type="text" 
+            placeholder="Pesquisar por nome, telefone ou tag..." 
+            value={searchTerm}
+            className="w-full bg-transparent border-none p-0 outline-none"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <button className="btn-secondary p-4 flex items-center justify-center">
+          <Filter size={20} />
+        </button>
       </div>
 
       <div className="contacts-table-container glass">
-        <table className="contacts-table">
+        <table className="contacts-table w-full">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Telefone</th>
-              <th>Status</th>
-              <th>Ações</th>
+              <th className="px-6 py-5 text-left text-[11px] font-bold uppercase tracking-widest opacity-40">Lead</th>
+              <th className="px-6 py-5 text-left text-[11px] font-bold uppercase tracking-widest opacity-40">Telefone</th>
+              <th className="px-6 py-5 text-left text-[11px] font-bold uppercase tracking-widest opacity-40">Status</th>
+              <th className="px-6 py-5 text-right text-[11px] font-bold uppercase tracking-widest opacity-40">Ações</th>
             </tr>
           </thead>
           <tbody>
             <AnimatePresence>
               {filteredContacts.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-muted">
-                    Nenhum contato encontrado.
+                  <td colSpan={4} className="text-center py-20">
+                    <div className="flex flex-col items-center opacity-20">
+                      <Users size={64} className="mb-4" />
+                      <p className="font-semibold">Nenhum contato na sua base no momento.</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                filteredContacts.map((contact) => (
+                filteredContacts.map((contact, i) => (
                   <motion.tr 
                     key={contact.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.02 }}
+                    className="hover:bg-white/[0.02] transition-colors group"
                   >
-                    <td>
-                      <div className="user-info">
-                        <div className="user-avatar">{contact.name.charAt(0)}</div>
-                        <span>{contact.name}</span>
+                    <td className="px-6 py-4">
+                      <div className="user-info flex items-center gap-4">
+                        <div className="user-avatar w-10 h-10 rounded-xl bg-accent-gradient flex items-center justify-center font-bold text-sm shadow-lg shadow-purple-500/20">
+                          {contact.name.charAt(0)}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-sm">{contact.name}</span>
+                          <span className="text-[10px] opacity-40 font-mono">ID_{contact.id}</span>
+                        </div>
                       </div>
                     </td>
-                    <td>{contact.phone}</td>
-                    <td>
-                      <span className={`status-pill ${contact.status.toLowerCase()}`}>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-medium opacity-70">{contact.phone}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`status-pill px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${contact.status.toLowerCase()}`}>
                         {contact.status}
                       </span>
                     </td>
-                    <td>
-                      <div className="table-actions">
-                        <button title="Excluir" onClick={() => deleteContact(contact.id)}>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white" title="Excluir" onClick={() => deleteContact(contact.id)}>
                           <Trash2 size={16} />
+                        </button>
+                        <button className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white">
+                          <MoreVertical size={16} />
                         </button>
                       </div>
                     </td>
@@ -129,6 +154,11 @@ const Contacts = () => {
           </tbody>
         </table>
       </div>
+
+      <style jsx>{`
+        .status-pill.ativo { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pill.inativo { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+      `}</style>
     </div>
   );
 };

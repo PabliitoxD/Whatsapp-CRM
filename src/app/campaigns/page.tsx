@@ -11,9 +11,11 @@ import {
   AlertCircle,
   Terminal,
   Type,
-  Smartphone
+  Smartphone,
+  BarChart3,
+  Rocket
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
 
@@ -134,132 +136,136 @@ const Campaigns = () => {
   return (
     <div className="campaigns-page animate-fade-in">
       <header className="page-header">
-        <div>
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <h1>Disparo em <span className="gradient-text">Massa</span></h1>
-          <p>Configure e inicie suas campanhas de marketing pelo WhatsApp.</p>
-        </div>
+          <p>Potencialize seu alcance com automação inteligente.</p>
+        </motion.div>
       </header>
 
-      <div className="campaign-grid">
-        <div className="campaign-form glass">
-          <div className="form-section">
-            <label><Smartphone size={16} /> Selecionar Aparelho</label>
-            <select value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
-              <option value="">Escolha um aparelho...</option>
-              {instances.map(i => (
-                <option key={i.id} value={i.id} disabled={i.status !== 'connected'}>
-                  {i.name} ({i.status === 'connected' ? 'Online' : 'Offline'})
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className="campaign-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 space-y-6">
+          <div className="campaign-form glass p-8">
+            <h3 className="text-xl font-extrabold mb-6 flex items-center gap-3">
+              <Rocket size={20} className="text-primary" /> Configuração
+            </h3>
 
-          <div className="form-section">
-            <label><Type size={16} /> Nome da Campanha</label>
-            <input 
-              type="text" 
-              placeholder="Ex: Campanha de Lançamento" 
-              value={campaignName}
-              onChange={(e) => setCampaignName(e.target.value)}
-            />
-          </div>
-
-          <div className="form-section">
-            <label><Users size={16} /> Público Alvo</label>
-            <div className="stats-info">
-              <strong>{contacts.length}</strong> contatos carregados
+            <div className="form-section mb-6">
+              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Aparelho de Envio</label>
+              <select className="w-full" value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
+                <option value="">Escolha uma conexão...</option>
+                {instances.map(i => (
+                  <option key={i.id} value={i.id} disabled={i.status !== 'connected'}>
+                    {i.name} {i.status === 'connected' ? '🟢' : '🔴'}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
 
-          <div className="form-section">
-            <label><MessageSquare size={16} /> Modelo de Mensagem</label>
-            <select 
-              value={selectedTemplateId} 
-              onChange={(e) => setSelectedTemplateId(e.target.value)}
-            >
-              <option value="">Selecione um modelo...</option>
-              {templates.map(t => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-            {selectedTemplateId && (
-              <div className="template-preview-box">
-                {templates.find(t => t.id === selectedTemplateId)?.content}
-              </div>
-            )}
-          </div>
+            <div className="form-section mb-6">
+              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Identificação</label>
+              <input 
+                type="text" 
+                placeholder="Nome da Campanha" 
+                className="w-full"
+                value={campaignName}
+                onChange={(e) => setCampaignName(e.target.value)}
+              />
+            </div>
 
-          <div className="form-section">
-            <label><Clock size={16} /> Intervalo entre envios (segundos)</label>
-            <input 
-              type="number" 
-              value={delay} 
-              onChange={(e) => setDelay(parseInt(e.target.value))}
-              min="1"
-            />
-            <p className="hint">Mantenha entre 30-60s para maior segurança.</p>
-          </div>
+            <div className="form-section mb-6">
+              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Modelo de Conteúdo</label>
+              <select 
+                className="w-full"
+                value={selectedTemplateId} 
+                onChange={(e) => setSelectedTemplateId(e.target.value)}
+              >
+                <option value="">Selecione o texto...</option>
+                {templates.map(t => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="form-actions">
+            <div className="form-section mb-8">
+              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Delay de Segurança (Seg)</label>
+              <input 
+                type="number" 
+                className="w-full"
+                value={delay} 
+                onChange={(e) => setDelay(parseInt(e.target.value))}
+                min="1"
+              />
+            </div>
+
             <button 
-              className={`btn-primary gradient-bg full-width ${isRunning ? 'disabled' : ''}`}
+              className={`btn-primary gradient-bg w-full justify-center py-4 ${isRunning ? 'opacity-50 pointer-events-none' : ''}`}
               onClick={startCampaign}
               disabled={isRunning}
             >
               <Play size={18} />
-              {isRunning ? 'Campanha em Execução...' : 'Iniciar Campanha'}
+              <span className="font-bold uppercase tracking-widest text-xs">
+                {isRunning ? 'Executando...' : 'Lançar Campanha'}
+              </span>
             </button>
           </div>
         </div>
 
-        <div className="campaign-status">
-          <div className="status-overview glass">
-            <h3>Progresso da Campanha</h3>
-            <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: `${progress}%` }}></div>
-            </div>
-            <div className="progress-stats">
-              <span>{progress}% Completo</span>
-              <span>{stats.success + stats.error} / {contacts.length}</span>
-            </div>
-          </div>
-
-          <div className="stats-mini-grid">
-            <div className="stat-mini glass">
-              <div className="stat-icon success"><Send size={16} /></div>
-              <div className="stat-details">
-                <span className="stat-label">Sucesso</span>
-                <span className="stat-val">{stats.success}</span>
-              </div>
-            </div>
-            <div className="stat-mini glass">
-              <div className="stat-icon error"><AlertCircle size={16} /></div>
-              <div className="stat-details">
-                <span className="stat-label">Erros</span>
-                <span className="stat-val">{stats.error}</span>
-              </div>
-            </div>
-            <div className="stat-mini glass">
-              <div className="stat-icon info"><Clock size={16} /></div>
-              <div className="stat-details">
-                <span className="stat-label">Restante</span>
-                <span className="stat-val">{contacts.length - (stats.success + stats.error)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="live-log glass">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Terminal size={16} /> Log em Tempo Real
+        <div className="lg:col-span-2 space-y-6">
+          <div className="status-overview glass p-8">
+            <h3 className="text-xl font-extrabold mb-6 flex items-center gap-3">
+              <BarChart3 size={20} className="text-primary" /> Performance em Tempo Real
             </h3>
-            <div className="log-container">
+            
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl">
+                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Sucesso</p>
+                <p className="text-3xl font-black text-success">{stats.success}</p>
+              </div>
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl">
+                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Erros</p>
+                <p className="text-3xl font-black text-error">{stats.error}</p>
+              </div>
+              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl">
+                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Pendente</p>
+                <p className="text-3xl font-black opacity-60">{contacts.length - (stats.success + stats.error)}</p>
+              </div>
+            </div>
+
+            <div className="progress-container mb-2">
+              <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest opacity-40 mb-3">
+                <span>Progresso Geral</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                <motion.div 
+                  className="h-full bg-accent-gradient"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="live-log glass p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-extrabold flex items-center gap-3">
+                <Terminal size={20} className="text-primary" /> Log de Transmissão
+              </h3>
+              <span className="animate-pulse flex items-center gap-2 text-[10px] font-bold text-success uppercase tracking-widest">
+                <span className="w-2 h-2 bg-success rounded-full"></span> Live
+              </span>
+            </div>
+            <div className="log-container h-[250px] overflow-y-auto font-mono text-xs space-y-2 p-4 bg-black/40 rounded-2xl border border-white/5">
               {logs.length === 0 ? (
-                <div className="log-placeholder">
-                  Nenhuma atividade registrada.
+                <div className="h-full flex items-center justify-center opacity-10">
+                  <p>Aguardando início do processo...</p>
                 </div>
               ) : (
                 logs.map((log, i) => (
-                  <div key={i} className="log-entry">{log}</div>
+                  <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} key={i} className="log-entry py-1 border-b border-white/[0.02] last:border-0">
+                    <span className="text-primary mr-2 opacity-50">[{new Date().toLocaleTimeString()}]</span>
+                    <span className="text-white/80">{log}</span>
+                  </motion.div>
                 ))
               )}
             </div>
