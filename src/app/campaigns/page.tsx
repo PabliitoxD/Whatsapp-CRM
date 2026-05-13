@@ -3,24 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Send, 
-  Users, 
-  MessageSquare, 
+  Play, 
   Clock,
-  Play,
-  Pause,
-  AlertCircle,
   Terminal,
-  Type,
   Smartphone,
-  BarChart3,
-  Rocket
+  MessageSquare,
+  Type,
+  CheckCircle,
+  AlertCircle,
+  BarChart2
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
 
 const Campaigns = () => {
-  const { contacts, templates, instances, addCampaign, updateCampaignStats } = useContacts();
+  const { contacts, templates, instances, campaigns, addCampaign, updateCampaignStats } = useContacts();
   const [campaignName, setCampaignName] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [selectedInstanceId, setSelectedInstanceId] = useState('');
@@ -65,31 +62,13 @@ const Campaigns = () => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 50));
   };
 
-  const replaceTags = (text: string, contact: any) => {
-    return text
-      .replace(/{{nome}}/g, contact.name)
-      .replace(/{{telefone}}/g, contact.phone);
-  };
-
   const startCampaign = async () => {
-    if (!selectedInstanceId) {
-      alert('Selecione um aparelho para o disparo!');
-      return;
-    }
-    if (!campaignName) {
-      alert('Digite o nome da campanha!');
-      return;
-    }
-    if (!selectedTemplateId) {
-      alert('Selecione um modelo de mensagem!');
+    if (!selectedInstanceId || !campaignName || !selectedTemplateId) {
+      alert('Preencha todos os campos!');
       return;
     }
     if (contacts.length === 0) {
       alert('Importe contatos primeiro!');
-      return;
-    }
-    if (!socket) {
-      alert('Servidor WhatsApp não conectado!');
       return;
     }
 
@@ -102,7 +81,6 @@ const Campaigns = () => {
       total: contacts.length
     });
     setCurrentCampaignId(campId);
-
     setIsRunning(true);
     setStats({ total: contacts.length, success: 0, error: 0 });
     setProgress(0);
@@ -110,165 +88,134 @@ const Campaigns = () => {
 
     for (let i = 0; i < contacts.length; i++) {
       if (!isRunning && i > 0) break; 
-
       const contact = contacts[i];
-      const personalizedMessage = replaceTags(template.content, contact);
+      const msg = template.content.replace(/{{nome}}/g, contact.name).replace(/{{telefone}}/g, contact.phone);
       
-      addLog(`⏳ Enviando para ${contact.name}...`);
-      socket.emit('send-message', { 
-        instanceId: selectedInstanceId,
-        to: contact.phone, 
-        message: personalizedMessage 
-      });
-
+      socket?.emit('send-message', { instanceId: selectedInstanceId, to: contact.phone, message: msg });
       setProgress(Math.round(((i + 1) / contacts.length) * 100));
 
       if (i < contacts.length - 1) {
-        addLog(`💤 Aguardando ${delay}s...`);
         await new Promise(resolve => setTimeout(resolve, delay * 1000));
       }
     }
-
     setIsRunning(false);
     addLog('🏁 Campanha finalizada!');
   };
 
   return (
-    <div className="campaigns-page animate-fade-in">
-      <header className="page-header">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1>Disparo em <span className="gradient-text">Massa</span></h1>
-          <p>Potencialize seu alcance com automação inteligente.</p>
-        </motion.div>
-      </header>
+    <div className="campaigns-page">
+      <div className="card-header mb-8">
+        <h1 className="text-3xl font-extrabold">Gestão de <span style={{ color: 'var(--primary)' }}>Campanhas</span></h1>
+        <p className="text-muted">Criação e acompanhamento detalhado.</p>
+      </div>
 
-      <div className="campaign-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-6">
-          <div className="campaign-form glass p-8">
-            <h3 className="text-xl font-extrabold mb-6 flex items-center gap-3">
-              <Rocket size={20} className="text-primary" /> Configuração
-            </h3>
+      <div className="grid-2">
+        {/* Coluna Esquerda: Criar Campanha */}
+        <div className="card">
+          <div className="card-header border-b border-white/5 pb-4 mb-4">
+            <h3 className="card-title flex items-center gap-2"><Play size={18} /> Nova Campanha</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold uppercase text-muted mb-2 block">Nome da Campanha</label>
+              <input type="text" placeholder="Ex: Promoção de Verão" value={campaignName} onChange={(e) => setCampaignName(e.target.value)} />
+            </div>
 
-            <div className="form-section mb-6">
-              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Aparelho de Envio</label>
-              <select className="w-full" value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
-                <option value="">Escolha uma conexão...</option>
+            <div>
+              <label className="text-xs font-bold uppercase text-muted mb-2 block">Aparelho de Envio</label>
+              <select value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
+                <option value="">Selecione um aparelho...</option>
                 {instances.map(i => (
                   <option key={i.id} value={i.id} disabled={i.status !== 'connected'}>
-                    {i.name} {i.status === 'connected' ? '🟢' : '🔴'}
+                    {i.name} ({i.status === 'connected' ? 'Online' : 'Offline'})
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="form-section mb-6">
-              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Identificação</label>
-              <input 
-                type="text" 
-                placeholder="Nome da Campanha" 
-                className="w-full"
-                value={campaignName}
-                onChange={(e) => setCampaignName(e.target.value)}
-              />
-            </div>
-
-            <div className="form-section mb-6">
-              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Modelo de Conteúdo</label>
-              <select 
-                className="w-full"
-                value={selectedTemplateId} 
-                onChange={(e) => setSelectedTemplateId(e.target.value)}
-              >
-                <option value="">Selecione o texto...</option>
+            <div>
+              <label className="text-xs font-bold uppercase text-muted mb-2 block">Modelo de Mensagem</label>
+              <select value={selectedTemplateId} onChange={(e) => setSelectedTemplateId(e.target.value)}>
+                <option value="">Selecione um modelo...</option>
                 {templates.map(t => (
                   <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
             </div>
 
-            <div className="form-section mb-8">
-              <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2 block">Delay de Segurança (Seg)</label>
-              <input 
-                type="number" 
-                className="w-full"
-                value={delay} 
-                onChange={(e) => setDelay(parseInt(e.target.value))}
-                min="1"
-              />
+            <div>
+              <label className="text-xs font-bold uppercase text-muted mb-2 block">Delay entre envios (Seg)</label>
+              <input type="number" value={delay} onChange={(e) => setDelay(parseInt(e.target.value))} />
             </div>
 
-            <button 
-              className={`btn-primary gradient-bg w-full justify-center py-4 ${isRunning ? 'opacity-50 pointer-events-none' : ''}`}
-              onClick={startCampaign}
-              disabled={isRunning}
-            >
-              <Play size={18} />
-              <span className="font-bold uppercase tracking-widest text-xs">
-                {isRunning ? 'Executando...' : 'Lançar Campanha'}
-              </span>
+            <button className="btn-primary w-full py-4 mt-4" onClick={startCampaign} disabled={isRunning}>
+              <Send size={18} /> {isRunning ? 'Enviando...' : 'Iniciar Disparos'}
             </button>
           </div>
-        </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          <div className="status-overview glass p-8">
-            <h3 className="text-xl font-extrabold mb-6 flex items-center gap-3">
-              <BarChart3 size={20} className="text-primary" /> Performance em Tempo Real
-            </h3>
-            
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl">
-                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Sucesso</p>
-                <p className="text-3xl font-black text-success">{stats.success}</p>
-              </div>
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl">
-                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Erros</p>
-                <p className="text-3xl font-black text-error">{stats.error}</p>
-              </div>
-              <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl">
-                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Pendente</p>
-                <p className="text-3xl font-black opacity-60">{contacts.length - (stats.success + stats.error)}</p>
-              </div>
-            </div>
-
-            <div className="progress-container mb-2">
-              <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest opacity-40 mb-3">
-                <span>Progresso Geral</span>
+          {/* Mini Log */}
+          {isRunning && (
+            <div className="mt-8">
+              <div className="flex justify-between text-[10px] font-bold uppercase text-muted mb-2">
+                <span>Progresso</span>
                 <span>{progress}%</span>
               </div>
-              <div className="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
-                <motion.div 
-                  className="h-full bg-accent-gradient"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                />
+              <div className="w-full bg-black h-2 rounded-full overflow-hidden">
+                <div className="bg-primary h-full transition-all" style={{ width: `${progress}%` }} />
+              </div>
+              <div className="mt-4 p-3 bg-black/40 rounded border border-white/5 font-mono text-[10px] h-32 overflow-y-auto">
+                {logs.map((log, i) => <div key={i} className="mb-1">{log}</div>)}
               </div>
             </div>
+          )}
+        </div>
+
+        {/* Coluna Direita: Histórico e Detalhes */}
+        <div className="card">
+          <div className="card-header border-b border-white/5 pb-4 mb-4">
+            <h3 className="card-title flex items-center gap-2"><BarChart2 size={18} /> Detalhes das Campanhas</h3>
           </div>
 
-          <div className="live-log glass p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-extrabold flex items-center gap-3">
-                <Terminal size={20} className="text-primary" /> Log de Transmissão
-              </h3>
-              <span className="animate-pulse flex items-center gap-2 text-[10px] font-bold text-success uppercase tracking-widest">
-                <span className="w-2 h-2 bg-success rounded-full"></span> Live
-              </span>
-            </div>
-            <div className="log-container h-[250px] overflow-y-auto font-mono text-xs space-y-2 p-4 bg-black/40 rounded-2xl border border-white/5">
-              {logs.length === 0 ? (
-                <div className="h-full flex items-center justify-center opacity-10">
-                  <p>Aguardando início do processo...</p>
+          <div className="space-y-6">
+            {campaigns.length === 0 ? (
+              <p className="text-muted text-center py-20">Nenhuma campanha registrada.</p>
+            ) : (
+              campaigns.map((camp) => (
+                <div key={camp.id} className="p-5 bg-black/40 rounded-xl border border-white/10">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-lg font-bold">{camp.name}</span>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${camp.status === 'Rodando' ? 'bg-primary/20 text-primary' : 'bg-success/20 text-success'}`}>
+                      {camp.status}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+                    <div className="text-center bg-white/5 p-3 rounded-lg">
+                      <p className="text-[9px] text-muted uppercase font-bold">Enviados</p>
+                      <p className="text-md font-bold text-success">{camp.success}</p>
+                    </div>
+                    <div className="text-center bg-white/5 p-3 rounded-lg">
+                      <p className="text-[9px] text-muted uppercase font-bold">Recusados</p>
+                      <p className="text-md font-bold text-error">{camp.error}</p>
+                    </div>
+                    <div className="text-center bg-white/5 p-3 rounded-lg">
+                      <p className="text-[9px] text-muted uppercase font-bold">Abertura</p>
+                      <p className="text-md font-bold">-- %</p>
+                    </div>
+                    <div className="text-center bg-white/5 p-3 rounded-lg">
+                      <p className="text-[9px] text-muted uppercase font-bold">Resposta</p>
+                      <p className="text-md font-bold">-- %</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted mt-4 pt-4 border-t border-white/5">
+                    <span>Aparelho: <b className="text-white">{instances.find(i => i.id === camp.id)?.name || 'Padrão'}</b></span>
+                    <span>Total de leads: <b className="text-white">{camp.total}</b></span>
+                  </div>
                 </div>
-              ) : (
-                logs.map((log, i) => (
-                  <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} key={i} className="log-entry py-1 border-b border-white/[0.02] last:border-0">
-                    <span className="text-primary mr-2 opacity-50">[{new Date().toLocaleTimeString()}]</span>
-                    <span className="text-white/80">{log}</span>
-                  </motion.div>
-                ))
-              )}
-            </div>
+              ))
+            )}
           </div>
         </div>
       </div>

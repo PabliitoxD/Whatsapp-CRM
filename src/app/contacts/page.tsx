@@ -6,13 +6,9 @@ import {
   Upload, 
   Trash2, 
   Search,
-  MoreVertical,
-  Mail,
-  UserPlus,
   Filter,
   Download
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useContacts } from '../../lib/ContactContext';
 
 const Contacts = () => {
@@ -51,114 +47,91 @@ const Contacts = () => {
   );
 
   return (
-    <div className="contacts-page animate-fade-in">
-      <header className="page-header flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="contacts-page">
+      <div className="card-header mb-8" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-            Audiência <span className="gradient-text">Master</span>
-          </motion.h1>
-          <p>Gerencie sua base de {contacts.length} leads qualificados.</p>
+          <h1 className="text-3xl font-extrabold">Gestão de <span style={{ color: 'var(--primary)' }}>Contatos</span></h1>
+          <p className="text-muted">Total de {contacts.length} leads qualificados.</p>
         </div>
-        <div className="header-actions flex gap-3">
-          <button className="btn-secondary flex items-center gap-2" onClick={clearContacts}>
-            <Trash2 size={18} />
-            <span className="hidden sm:inline">Limpar Base</span>
+        <div className="flex gap-3" style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="btn-primary" style={{ background: 'var(--error)' }} onClick={clearContacts}>
+            <Trash2 size={18} /> Limpar Tudo
           </button>
-          <label className="btn-primary gradient-bg cursor-pointer flex items-center gap-2">
-            <Upload size={18} />
-            <span>Importar Leads</span>
+          <label className="btn-primary cursor-pointer">
+            <Upload size={18} /> Importar CSV
             <input type="file" hidden accept=".csv,.txt" onChange={handleFileUpload} />
           </label>
         </div>
-      </header>
-
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="search-bar glass flex-1 flex items-center px-6 py-4 gap-4">
-          <Search size={20} className="text-white/20" />
-          <input 
-            type="text" 
-            placeholder="Pesquisar por nome, telefone ou tag..." 
-            value={searchTerm}
-            className="w-full bg-transparent border-none p-0 outline-none"
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <button className="btn-secondary p-4 flex items-center justify-center">
-          <Filter size={20} />
-        </button>
       </div>
 
-      <div className="contacts-table-container glass">
-        <table className="contacts-table w-full">
-          <thead>
-            <tr>
-              <th className="px-6 py-5 text-left text-[11px] font-bold uppercase tracking-widest opacity-40">Lead</th>
-              <th className="px-6 py-5 text-left text-[11px] font-bold uppercase tracking-widest opacity-40">Telefone</th>
-              <th className="px-6 py-5 text-left text-[11px] font-bold uppercase tracking-widest opacity-40">Status</th>
-              <th className="px-6 py-5 text-right text-[11px] font-bold uppercase tracking-widest opacity-40">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <AnimatePresence>
+      <div className="card mb-6">
+        <div className="flex items-center gap-4" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="flex-1" style={{ flex: 1 }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '0.8rem', opacity: 0.3 }} />
+              <input 
+                type="text" 
+                placeholder="Pesquisar por nome ou telefone..." 
+                className="pl-12"
+                style={{ paddingLeft: '3rem' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}>
+            <Filter size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Lead</th>
+                <th>Telefone</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
               {filteredContacts.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-20">
-                    <div className="flex flex-col items-center opacity-20">
-                      <Users size={64} className="mb-4" />
-                      <p className="font-semibold">Nenhum contato na sua base no momento.</p>
-                    </div>
+                  <td colSpan={4} className="text-center py-20 opacity-30 text-muted">
+                    Nenhum contato encontrado na sua base.
                   </td>
                 </tr>
               ) : (
-                filteredContacts.map((contact, i) => (
-                  <motion.tr 
-                    key={contact.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.02 }}
-                    className="hover:bg-white/[0.02] transition-colors group"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="user-info flex items-center gap-4">
-                        <div className="user-avatar w-10 h-10 rounded-xl bg-accent-gradient flex items-center justify-center font-bold text-sm shadow-lg shadow-purple-500/20">
+                filteredContacts.map((contact) => (
+                  <tr key={contact.id}>
+                    <td>
+                      <div className="flex items-center gap-3" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs" style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.2)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {contact.name.charAt(0)}
                         </div>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-sm">{contact.name}</span>
-                          <span className="text-[10px] opacity-40 font-mono">ID_{contact.id}</span>
-                        </div>
+                        <span className="font-semibold">{contact.name}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium opacity-70">{contact.phone}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`status-pill px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${contact.status.toLowerCase()}`}>
+                    <td className="font-mono text-muted">{contact.phone}</td>
+                    <td>
+                      <span className="text-[10px] font-bold px-2 py-1 rounded bg-success/10 text-success border border-success/20">
                         {contact.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white" title="Excluir" onClick={() => deleteContact(contact.id)}>
-                          <Trash2 size={16} />
-                        </button>
-                        <button className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white">
-                          <MoreVertical size={16} />
-                        </button>
-                      </div>
+                    <td style={{ textAlign: 'right' }}>
+                      <button className="text-muted hover:text-error" onClick={() => deleteContact(contact.id)}>
+                        <Trash2 size={16} />
+                      </button>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))
               )}
-            </AnimatePresence>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <style jsx>{`
-        .status-pill.ativo { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .status-pill.inativo { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
-      `}</style>
     </div>
   );
 };

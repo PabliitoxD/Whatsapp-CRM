@@ -4,16 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Send, 
-  MessageSquare, 
-  CheckCircle, 
-  Clock, 
-  AlertCircle,
   Zap,
   Smartphone,
-  ChevronRight,
-  Loader2,
+  CheckCircle,
+  AlertCircle,
   Activity,
-  ShieldCheck
+  BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useContacts } from '../lib/ContactContext';
@@ -36,151 +32,114 @@ const Dashboard = () => {
     };
   }, []);
 
-  const stats = [
-    { title: 'Base de Contatos', value: contacts.length, icon: <Users size={24} />, color: '#8b5cf6', trend: '+12% este mês' },
-    { title: 'Mensagens Enviadas', value: campaigns.reduce((acc, c) => acc + c.success, 0), icon: <Send size={24} />, color: '#10b981', trend: 'Taxa de 98% entrega' },
-    { title: 'Campanhas Ativas', value: campaigns.length, icon: <Zap size={24} />, color: '#00f2fe', trend: 'Performance estável' },
-    { title: 'Aparelhos Conectados', value: instances.filter(i => i.status === 'connected').length, icon: <Smartphone size={24} />, color: '#f59e0b', trend: `${instances.length} cadastrados` },
-  ];
+  const totalSent = campaigns.reduce((acc, c) => acc + c.success, 0);
+  const totalErrors = campaigns.reduce((acc, c) => acc + c.error, 0);
 
   return (
-    <div className="dashboard-page animate-fade-in">
-      <header className="page-header">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <h1>Dashboard <span className="gradient-text">Geral</span></h1>
-          <p>Visão estratégica das suas operações de WhatsApp.</p>
-        </motion.div>
-      </header>
-
-      <div className="stats-grid">
-        {stats.map((stat, i) => (
-          <motion.div 
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="stat-card glass"
-          >
-            <div className="stat-icon-wrapper" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
-              {stat.icon}
-            </div>
-            <div className="stat-info">
-              <span className="stat-label">{stat.title}</span>
-              <span className="stat-val">{stat.value}</span>
-              <span className="text-[10px] opacity-40 font-semibold uppercase tracking-wider">{stat.trend}</span>
-            </div>
-          </motion.div>
-        ))}
+    <div className="dashboard-page">
+      <div className="card-header mb-8">
+        <h1 className="text-3xl font-extrabold">Dashboard <span style={{ color: 'var(--primary)' }}>Master</span></h1>
+        <p className="text-muted">Acompanhamento geral e status de instâncias.</p>
       </div>
 
-      <div className="dashboard-content mt-8">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="whatsapp-status-card glass"
-        >
-          <div className="card-header">
-            <div className="flex items-center gap-3">
-              <Activity size={20} className="text-primary" />
-              <h3>Status de Conexão</h3>
-            </div>
-            <ShieldCheck size={20} className="text-success opacity-50" />
+      {/* Relatório Geral */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+        <div className="card">
+          <p className="text-muted text-xs font-bold uppercase mb-1">Contatos na Base</p>
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-black">{contacts.length}</span>
+            <Users size={20} className="text-primary" />
           </div>
+        </div>
+        <div className="card">
+          <p className="text-muted text-xs font-bold uppercase mb-1">Envios com Sucesso</p>
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-black text-success">{totalSent}</span>
+            <Send size={20} className="text-success" />
+          </div>
+        </div>
+        <div className="card">
+          <p className="text-muted text-xs font-bold uppercase mb-1">Erros de Disparo</p>
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-black text-error">{totalErrors}</span>
+            <AlertCircle size={20} className="text-error" />
+          </div>
+        </div>
+        <div className="card">
+          <p className="text-muted text-xs font-bold uppercase mb-1">Instâncias Ativas</p>
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-black">{instances.filter(i => i.status === 'connected').length}</span>
+            <Smartphone size={20} className="text-primary" />
+          </div>
+        </div>
+      </div>
 
-          <div className="instance-list p-6">
+      <div className="grid-2">
+        {/* Coluna 1: Aparelhos Conectados */}
+        <div className="card">
+          <div className="card-header border-b border-white/5 pb-4 mb-4" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <h3 className="card-title flex items-center gap-2"><Smartphone size={18} /> Aparelhos Conectados</h3>
+          </div>
+          <div className="space-y-4">
             {instances.length === 0 ? (
-              <div className="empty-instances text-center py-12">
-                <Smartphone size={48} className="mx-auto mb-4 opacity-10" />
-                <p className="text-sm text-muted">Nenhum aparelho configurado.</p>
-                <button className="btn-secondary mt-4 text-xs">Configurar Agora</button>
-              </div>
+              <p className="text-muted text-center py-8">Nenhuma instância cadastrada.</p>
             ) : (
               instances.map((instance) => (
-                <div key={instance.id} className="instance-item flex items-center justify-between p-4 mb-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className={`status-dot ${instance.status}`}></div>
-                    <div>
-                      <p className="font-bold text-sm">{instance.name}</p>
-                      <p className="text-[10px] text-muted font-mono uppercase">ID: {instance.id}</p>
-                    </div>
+                <div key={instance.id} className="flex items-center justify-between p-3 bg-black/40 rounded-xl border border-white/5">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${instance.status === 'connected' ? 'bg-success' : 'bg-error'}`} />
+                    <span className="font-semibold text-sm">{instance.name}</span>
                   </div>
-                  <span className={`status-badge ${instance.status}`}>
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${instance.status === 'connected' ? 'bg-success/20 text-success' : 'bg-error/20 text-error'}`}>
                     {instance.status === 'connected' ? 'Online' : 'Offline'}
                   </span>
                 </div>
               ))
             )}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="recent-activity glass"
-        >
-          <div className="card-header">
-            <div className="flex items-center gap-3">
-              <Clock size={20} className="text-primary" />
-              <h3>Últimas Campanhas</h3>
-            </div>
+        {/* Coluna 2: Relatório de Campanhas */}
+        <div className="card">
+          <div className="card-header border-b border-white/5 pb-4 mb-4">
+            <h3 className="card-title flex items-center gap-2"><BarChart3 size={18} /> Relatórios de Campanhas</h3>
           </div>
-          <div className="activity-list p-6">
+          <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '500px' }}>
             {campaigns.length === 0 ? (
-              <div className="empty-activity text-center py-12">
-                <Send size={48} className="mx-auto mb-4 opacity-10" />
-                <p className="text-muted text-sm">Aguardando seu primeiro disparo.</p>
-              </div>
+              <p className="text-muted text-center py-8">Nenhuma campanha realizada.</p>
             ) : (
-              campaigns.slice(0, 5).map((camp) => (
-                <div key={camp.id} className="activity-item flex items-center justify-between p-4 mb-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="activity-icon text-primary bg-primary/10 p-2 rounded-lg"><Send size={16} /></div>
-                    <div>
-                      <p className="font-bold text-sm">{camp.name}</p>
-                      <div className="flex gap-4 text-[11px] text-muted mt-1 font-medium">
-                        <span className="flex items-center gap-1"><CheckCircle size={10} className="text-success" /> {camp.success}</span>
-                        <span className="flex items-center gap-1"><AlertCircle size={10} className="text-error" /> {camp.error}</span>
-                        <span>{new Date(camp.createdAt).toLocaleDateString()}</span>
-                      </div>
+              campaigns.map((camp) => (
+                <div key={camp.id} className="p-4 bg-black/40 rounded-xl border border-white/5">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-bold">{camp.name}</span>
+                    <span className="text-[10px] bg-white/5 px-2 py-1 rounded text-muted">{new Date(camp.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted uppercase font-bold">Sucesso</p>
+                      <p className="text-lg font-black text-success">{camp.success}</p>
+                    </div>
+                    <div className="text-center border-l border-white/5">
+                      <p className="text-[10px] text-muted uppercase font-bold">Erros</p>
+                      <p className="text-lg font-black text-error">{camp.error}</p>
+                    </div>
+                    <div className="text-center border-l border-white/5">
+                      <p className="text-[10px] text-muted uppercase font-bold">Total</p>
+                      <p className="text-lg font-black">{camp.total}</p>
                     </div>
                   </div>
-                  <ChevronRight size={16} className="text-white/20" />
+                  <div className="w-full bg-black h-1.5 rounded-full mt-4 overflow-hidden">
+                    <div 
+                      className="bg-primary h-full transition-all" 
+                      style={{ width: `${Math.round(((camp.success + camp.error) / camp.total) * 100)}%` }} 
+                    />
+                  </div>
                 </div>
               ))
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
-
-      <style jsx>{`
-        .status-dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          position: relative;
-        }
-        .status-dot.connected { 
-          background: var(--success); 
-          box-shadow: 0 0 15px var(--success);
-        }
-        .status-dot.connected::after {
-          content: "";
-          position: absolute;
-          inset: -2px;
-          border-radius: 50%;
-          border: 2px solid var(--success);
-          animation: pulse 2s infinite;
-        }
-        .status-dot.connecting { background: var(--warning); }
-        .status-dot.disconnected { background: var(--error); opacity: 0.5; }
-
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 0.8; }
-          100% { transform: scale(2.5); opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 };

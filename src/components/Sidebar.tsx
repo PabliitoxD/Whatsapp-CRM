@@ -26,23 +26,18 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">
-        <div className="relative">
-          <Zap size={32} className="logo-icon text-primary" fill="var(--primary)" />
-          <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
-        </div>
-        <span className="gradient-text">CRM Master</span>
+      <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '3rem', padding: '0 0.5rem' }}>
+        <Zap size={28} style={{ color: 'var(--primary)' }} fill="var(--primary)" />
+        <span style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.05em' }}>CRM MASTER</span>
       </div>
 
-      <nav className="sidebar-nav flex-1">
+      <nav className="sidebar-nav">
         {menuItems.map((item) => {
           const isActive = pathname === item.path;
           return (
-            <Link key={item.path} href={item.path}>
+            <Link key={item.path} href={item.path} style={{ textDecoration: 'none' }}>
               <div className={`nav-item ${isActive ? 'active' : ''}`}>
-                <div className={`nav-icon-wrapper ${isActive ? 'text-white' : 'text-white/40'}`}>
-                  {item.icon}
-                </div>
+                {item.icon}
                 <span>{item.name}</span>
               </div>
             </Link>
@@ -50,10 +45,10 @@ const Sidebar = () => {
         })}
       </nav>
 
-      <div className="sidebar-footer mt-auto pt-6 border-t border-white/5">
-        <div className="nav-item logout group hover:bg-error/10 hover:border-error/20 transition-all">
-          <LogOut size={20} className="text-white/40 group-hover:text-error transition-colors" />
-          <span className="group-hover:text-error transition-colors">Sair da Conta</span>
+      <div className="sidebar-footer" style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+        <div className="nav-item logout" style={{ cursor: 'pointer', color: 'var(--text-muted)' }}>
+          <LogOut size={20} />
+          <span>Sair da Conta</span>
         </div>
       </div>
     </aside>
