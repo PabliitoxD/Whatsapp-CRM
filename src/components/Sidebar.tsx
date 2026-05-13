@@ -19,8 +19,8 @@ const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
     { name: 'Contatos', icon: <Users size={20} />, path: '/contacts' },
+    { name: 'Modelos', icon: <MessageSquare size={20} />, path: '/templates' },
     { name: 'Campanhas', icon: <Send size={20} />, path: '/campaigns' },
-    { name: 'Mensagens', icon: <MessageSquare size={20} />, path: '/messages' },
     { name: 'Configurações', icon: <Settings size={20} />, path: '/settings' },
   ];
 

@@ -9,18 +9,21 @@ import {
   Play,
   Pause,
   AlertCircle,
-  Terminal
+  Terminal,
+  Type
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
 
 const Campaigns = () => {
-  const { contacts } = useContacts();
-  const [message, setMessage] = useState('');
+  const { contacts, templates, addCampaign, updateCampaignStats } = useContacts();
+  const [campaignName, setCampaignName] = useState('');
+  const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [delay, setDelay] = useState(30);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentCampaignId, setCurrentCampaignId] = useState<string | null>(null);
   const [stats, setStats] = useState({ total: 0, success: 0, error: 0 });
   const [logs, setLogs] = useState<string[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -31,10 +34,16 @@ const Campaigns = () => {
 
     newSocket.on('message-sent', (data) => {
       if (data.success) {
-        setStats(prev => ({ ...prev, success: prev.success + 1 }));
+        setStats(prev => {
+          const newStats = { ...prev, success: prev.success + 1 };
+          return newStats;
+        });
         addLog(`✅ Sucesso para: ${data.to}`);
       } else {
-        setStats(prev => ({ ...prev, error: prev.error + 1 }));
+        setStats(prev => {
+          const newStats = { ...prev, error: prev.error + 1 };
+          return newStats;
+        });
         addLog(`❌ Erro para ${data.to}: ${data.error}`);
       }
     });
@@ -43,6 +52,17 @@ const Campaigns = () => {
       newSocket.disconnect();
     };
   }, []);
+
+  // Update context when local stats change
+  useEffect(() => {
+    if (currentCampaignId) {
+      updateCampaignStats(currentCampaignId, { 
+        success: stats.success, 
+        error: stats.error,
+        status: isRunning ? 'Rodando' : 'Finalizada'
+      });
+    }
+  }, [stats, isRunning, currentCampaignId]);
 
   const addLog = (msg: string) => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 50));
@@ -55,12 +75,16 @@ const Campaigns = () => {
   };
 
   const startCampaign = async () => {
-    if (contacts.length === 0) {
-      alert('Importe contatos primeiro!');
+    if (!campaignName) {
+      alert('Digite o nome da campanha!');
       return;
     }
-    if (!message) {
-      alert('Digite uma mensagem!');
+    if (!selectedTemplateId) {
+      alert('Selecione um modelo de mensagem!');
+      return;
+    }
+    if (contacts.length === 0) {
+      alert('Importe contatos primeiro!');
       return;
     }
     if (!socket) {
@@ -68,16 +92,26 @@ const Campaigns = () => {
       return;
     }
 
+    const template = templates.find(t => t.id === selectedTemplateId);
+    if (!template) return;
+
+    const campId = addCampaign({
+      name: campaignName,
+      templateId: selectedTemplateId,
+      total: contacts.length
+    });
+    setCurrentCampaignId(campId);
+
     setIsRunning(true);
     setStats({ total: contacts.length, success: 0, error: 0 });
     setProgress(0);
-    addLog('🚀 Iniciando campanha...');
+    addLog(`🚀 Iniciando campanha: ${campaignName}`);
 
     for (let i = 0; i < contacts.length; i++) {
-      if (!isRunning && i > 0) break; // Allow stop (needs more logic for full pause)
+      if (!isRunning && i > 0) break; 
 
       const contact = contacts[i];
-      const personalizedMessage = replaceTags(message, contact);
+      const personalizedMessage = replaceTags(template.content, contact);
       
       addLog(`⏳ Enviando para ${contact.name}...`);
       socket.emit('send-message', { to: contact.phone, message: personalizedMessage });
@@ -106,6 +140,16 @@ const Campaigns = () => {
       <div className="campaign-grid">
         <div className="campaign-form glass">
           <div className="form-section">
+            <label><Type size={16} /> Nome da Campanha</label>
+            <input 
+              type="text" 
+              placeholder="Ex: Campanha de Lançamento" 
+              value={campaignName}
+              onChange={(e) => setCampaignName(e.target.value)}
+            />
+          </div>
+
+          <div className="form-section">
             <label><Users size={16} /> Público Alvo</label>
             <div className="stats-info">
               <strong>{contacts.length}</strong> contatos carregados
@@ -113,18 +157,45 @@ const Campaigns = () => {
           </div>
 
           <div className="form-section">
-            <label><MessageSquare size={16} /> Mensagem da Campanha</label>
-            <div className="message-input-wrapper">
-              <textarea 
-                placeholder="Olá {{nome}}, temos uma oferta especial para você..." 
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-              <div className="variables-hint">
-                Tags disponíveis: <code>{'{{nome}}'}</code>, <code>{'{{telefone}}'}</code>
+            <label><MessageSquare size={16} /> Modelo de Mensagem</label>
+            <select 
+              value={selectedTemplateId} 
+              onChange={(e) => setSelectedTemplateId(e.target.value)}
+            >
+              <option value="">Selecione um modelo...</option>
+              {templates.map(t => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+            {selectedTemplateId && (
+              <div className="template-preview-box">
+                {templates.find(t => t.id === selectedTemplateId)?.content}
               </div>
-            </div>
+            )}
           </div>
+
+          <div className="form-section">
+            <label><Clock size={16} /> Intervalo entre envios (segundos)</label>
+            <input 
+              type="number" 
+              value={delay} 
+              onChange={(e) => setDelay(parseInt(e.target.value))}
+              min="1"
+            />
+            <p className="hint">Mantenha entre 30-60s para maior segurança.</p>
+          </div>
+
+          <div className="form-actions">
+            <button 
+              className={`btn-primary gradient-bg full-width ${isRunning ? 'disabled' : ''}`}
+              onClick={startCampaign}
+              disabled={isRunning}
+            >
+              <Play size={18} />
+              {isRunning ? 'Campanha em Execução...' : 'Iniciar Campanha'}
+            </button>
+          </div>
+        </div>
 
           <div className="form-section">
             <label><Clock size={16} /> Intervalo entre envios (segundos)</label>
@@ -261,6 +332,18 @@ const Campaigns = () => {
         textarea {
           min-height: 150px;
           resize: vertical;
+        }
+
+        .template-preview-box {
+          background: rgba(0, 0, 0, 0.2);
+          padding: 1rem;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          color: rgba(255, 255, 255, 0.5);
+          border: 1px dashed var(--glass-border);
+          max-height: 100px;
+          overflow-y: auto;
+          white-space: pre-wrap;
         }
 
         .variables-hint {

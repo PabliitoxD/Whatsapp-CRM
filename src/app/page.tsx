@@ -129,30 +129,48 @@ const Dashboard = () => {
 
         <div className="recent-activity glass">
           <div className="card-header">
-            <h3>Dicas de Uso</h3>
+            <h3>Histórico de Campanhas</h3>
           </div>
           <div className="activity-list">
-            <div className="activity-item">
-              <div className="activity-icon"><CheckCircle size={16} /></div>
-              <div className="activity-details">
-                <p>Use o campo <strong>{{'{{nome}}'}}</strong> para personalizar suas mensagens.</p>
+            {campaigns.length === 0 ? (
+              <div className="empty-activity">
+                <p>Nenhuma campanha realizada ainda.</p>
               </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon"><Clock size={16} /></div>
-              <div className="activity-details">
-                <p>Mantenha um intervalo de pelo menos 30s entre os envios.</p>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon"><Users size={16} /></div>
-              <div className="activity-details">
-                <p>Importe arquivos CSV com as colunas <strong>nome, telefone</strong>.</p>
-              </div>
-            </div>
+            ) : (
+              campaigns.slice(0, 5).map((camp) => (
+                <div key={camp.id} className="activity-item">
+                  <div className="activity-icon">
+                    <Send size={16} />
+                  </div>
+                  <div className="activity-details">
+                    <p><strong>{camp.name}</strong> - {camp.status}</p>
+                    <div className="camp-mini-stats">
+                      <span>✅ {camp.success}</span>
+                      <span>❌ {camp.error}</span>
+                      <span>📅 {new Date(camp.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .camp-mini-stats {
+          display: flex;
+          gap: 0.75rem;
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
+        }
+        .empty-activity {
+          padding: 2rem;
+          text-align: center;
+          color: rgba(255, 255, 255, 0.2);
+          font-size: 0.875rem;
+        }
+      `}</style>
 
       <style jsx>{`
         .dashboard-page {
