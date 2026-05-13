@@ -28,10 +28,19 @@ export interface Campaign {
   createdAt: string;
 }
 
+export interface WhatsAppInstance {
+  id: string;
+  name: string;
+  status: 'disconnected' | 'connecting' | 'connected';
+  qrCode?: string;
+  createdAt: string;
+}
+
 interface ContactContextType {
   contacts: Contact[];
   templates: MessageTemplate[];
   campaigns: Campaign[];
+  instances: WhatsAppInstance[];
   addContacts: (newContacts: Omit<Contact, 'id' | 'createdAt'>[]) => void;
   deleteContact: (id: string) => void;
   clearContacts: () => void;
@@ -39,6 +48,9 @@ interface ContactContextType {
   deleteTemplate: (id: string) => void;
   addCampaign: (campaign: Omit<Campaign, 'id' | 'createdAt' | 'status' | 'success' | 'error'>) => string;
   updateCampaignStats: (id: string, stats: Partial<Pick<Campaign, 'success' | 'error' | 'status'>>) => void;
+  addInstance: (name: string) => void;
+  deleteInstance: (id: string) => void;
+  updateInstance: (id: string, updates: Partial<WhatsAppInstance>) => void;
 }
 
 const ContactContext = createContext<ContactContextType | undefined>(undefined);
@@ -47,16 +59,19 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [instances, setInstances] = useState<WhatsAppInstance[]>([]);
 
   // Load from localStorage on mount
   useEffect(() => {
     const savedContacts = localStorage.getItem('whatsapp-crm-contacts');
     const savedTemplates = localStorage.getItem('whatsapp-crm-templates');
     const savedCampaigns = localStorage.getItem('whatsapp-crm-campaigns');
+    const savedInstances = localStorage.getItem('whatsapp-crm-instances');
     
     if (savedContacts) setContacts(JSON.parse(savedContacts));
     if (savedTemplates) setTemplates(JSON.parse(savedTemplates));
     if (savedCampaigns) setCampaigns(JSON.parse(savedCampaigns));
+    if (savedInstances) setInstances(JSON.parse(savedInstances));
   }, []);
 
   // Save to localStorage
@@ -71,6 +86,10 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem('whatsapp-crm-campaigns', JSON.stringify(campaigns));
   }, [campaigns]);
+
+  useEffect(() => {
+    localStorage.setItem('whatsapp-crm-instances', JSON.stringify(instances));
+  }, [instances]);
 
   const addContacts = (newContacts: Omit<Contact, 'id' | 'createdAt'>[]) => {
     const contactsWithIds = newContacts.map(c => ({
@@ -120,18 +139,40 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setCampaigns(prev => prev.map(c => c.id === id ? { ...c, ...stats } : c));
   };
 
+  const addInstance = (name: string) => {
+    const newInstance: WhatsAppInstance = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      status: 'disconnected',
+      createdAt: new Date().toISOString(),
+    };
+    setInstances(prev => [...prev, newInstance]);
+  };
+
+  const deleteInstance = (id: string) => {
+    setInstances(prev => prev.filter(i => i.id !== id));
+  };
+
+  const updateInstance = (id: string, updates: Partial<WhatsAppInstance>) => {
+    setInstances(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
+  };
+
   return (
     <ContactContext.Provider value={{ 
       contacts, 
       templates, 
       campaigns,
+      instances,
       addContacts, 
       deleteContact, 
       clearContacts,
       addTemplate,
       deleteTemplate,
       addCampaign,
-      updateCampaignStats
+      updateCampaignStats,
+      addInstance,
+      deleteInstance,
+      updateInstance
     }}>
       {children}
     </ContactContext.Provider>

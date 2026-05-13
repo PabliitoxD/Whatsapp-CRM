@@ -10,16 +10,18 @@ import {
   Pause,
   AlertCircle,
   Terminal,
-  Type
+  Type,
+  Smartphone
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
 
 const Campaigns = () => {
-  const { contacts, templates, addCampaign, updateCampaignStats } = useContacts();
+  const { contacts, templates, instances, addCampaign, updateCampaignStats } = useContacts();
   const [campaignName, setCampaignName] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
+  const [selectedInstanceId, setSelectedInstanceId] = useState('');
   const [delay, setDelay] = useState(30);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -68,6 +70,10 @@ const Campaigns = () => {
   };
 
   const startCampaign = async () => {
+    if (!selectedInstanceId) {
+      alert('Selecione um aparelho para o disparo!');
+      return;
+    }
     if (!campaignName) {
       alert('Digite o nome da campanha!');
       return;
@@ -107,7 +113,11 @@ const Campaigns = () => {
       const personalizedMessage = replaceTags(template.content, contact);
       
       addLog(`⏳ Enviando para ${contact.name}...`);
-      socket.emit('send-message', { to: contact.phone, message: personalizedMessage });
+      socket.emit('send-message', { 
+        instanceId: selectedInstanceId,
+        to: contact.phone, 
+        message: personalizedMessage 
+      });
 
       setProgress(Math.round(((i + 1) / contacts.length) * 100));
 
@@ -132,6 +142,18 @@ const Campaigns = () => {
 
       <div className="campaign-grid">
         <div className="campaign-form glass">
+          <div className="form-section">
+            <label><Smartphone size={16} /> Selecionar Aparelho</label>
+            <select value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
+              <option value="">Escolha um aparelho...</option>
+              {instances.map(i => (
+                <option key={i.id} value={i.id} disabled={i.status !== 'connected'}>
+                  {i.name} ({i.status === 'connected' ? 'Online' : 'Offline'})
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="form-section">
             <label><Type size={16} /> Nome da Campanha</label>
             <input 

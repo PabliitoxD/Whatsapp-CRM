@@ -1,5 +1,4 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode');
 const { Server } = require('socket.io');
 const http = require('http');
 
@@ -12,85 +11,105 @@ const io = new Server(server, {
   }
 });
 
-let client;
+// Map to store multiple clients
+const clients = new Map();
 
-const initWhatsApp = (socket) => {
-  if (client) {
-    socket.emit('status', 'connecting');
+const createInstance = (instanceId, socket) => {
+  if (clients.has(instanceId)) {
+    const existing = clients.get(instanceId);
+    socket.emit('instance-status', { id: instanceId, status: existing.status });
     return;
   }
 
-  client = new Client({
+  console.log(`Creating instance: ${instanceId}`);
+  
+  const client = new Client({
     authStrategy: new LocalAuth({
-      dataPath: './.wwebjs_auth'
+      clientId: instanceId,
+      dataPath: `./.wwebjs_auth/session-${instanceId}`
     }),
     puppeteer: {
       headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-extensions',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
+        '--disable-dev-shm-usage'
       ],
     }
   });
 
+  const instanceData = {
+    client,
+    status: 'disconnected',
+    id: instanceId
+  };
+
+  clients.set(instanceId, instanceData);
+
   client.on('qr', (qr) => {
-    console.log('QR RECEIVED', qr);
-    qrcode.toDataURL(qr, (err, url) => {
-      socket.emit('qr', url);
-      socket.emit('status', 'disconnected');
-    });
+    console.log(`QR RECEIVED for ${instanceId}`);
+    instanceData.status = 'connecting';
+    io.emit('instance-qr', { id: instanceId, qr });
   });
 
   client.on('ready', () => {
-    console.log('CLIENT READY');
-    socket.emit('status', 'connected');
-  });
-
-  client.on('authenticated', () => {
-    console.log('AUTHENTICATED');
-  });
-
-  client.on('auth_failure', (msg) => {
-    console.error('AUTH FAILURE', msg);
-    socket.emit('status', 'disconnected');
+    console.log(`Client ${instanceId} is ready!`);
+    instanceData.status = 'connected';
+    io.emit('instance-status', { id: instanceId, status: 'connected' });
   });
 
   client.on('disconnected', (reason) => {
-    console.log('Client was logged out', reason);
-    socket.emit('status', 'disconnected');
-    client.initialize();
+    console.log(`Client ${instanceId} disconnected`, reason);
+    instanceData.status = 'disconnected';
+    io.emit('instance-status', { id: instanceId, status: 'disconnected' });
+    client.initialize(); // Auto re-init
   });
 
-  client.initialize();
+  client.initialize().catch(err => console.error(`Init error for ${instanceId}:`, err));
 };
 
 io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
+  console.log('New socket connection');
 
-  socket.on('init', () => {
-    initWhatsApp(socket);
+  // Request status for all instances
+  socket.on('get-all-instances', () => {
+    const instances = Array.from(clients.values()).map(ins => ({
+      id: ins.id,
+      status: ins.status
+    }));
+    socket.emit('all-instances-status', instances);
   });
 
-  socket.on('send-message', async ({ to, message }) => {
-    if (!client) return;
+  socket.on('init-instance', (instanceId) => {
+    createInstance(instanceId, socket);
+  });
+
+  socket.on('send-message', async ({ instanceId, to, message }) => {
+    const instance = clients.get(instanceId);
+    if (!instance || instance.status !== 'connected') {
+      socket.emit('message-sent', { success: false, error: 'Instância não conectada', to });
+      return;
+    }
+
     try {
       const chatId = to.includes('@c.us') ? to : `${to}@c.us`;
-      await client.sendMessage(chatId, message);
-      socket.emit('message-sent', { to, success: true });
+      await instance.client.sendMessage(chatId, message);
+      socket.emit('message-sent', { success: true, to });
     } catch (err) {
-      console.error('Error sending message:', err);
-      socket.emit('message-sent', { to, success: false, error: err.message });
+      socket.emit('message-sent', { success: false, error: err.message, to });
+    }
+  });
+
+  socket.on('delete-instance', (instanceId) => {
+    const instance = clients.get(instanceId);
+    if (instance) {
+      instance.client.destroy();
+      clients.delete(instanceId);
+      io.emit('instance-deleted', instanceId);
     }
   });
 });
 
 server.listen(port, () => {
-  console.log(`WhatsApp Server running on port ${port}`);
+  console.log(`Multi-instance WhatsApp server running on port ${port}`);
 });
