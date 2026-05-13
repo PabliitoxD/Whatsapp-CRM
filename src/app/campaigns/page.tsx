@@ -34,16 +34,10 @@ const Campaigns = () => {
 
     newSocket.on('message-sent', (data) => {
       if (data.success) {
-        setStats(prev => {
-          const newStats = { ...prev, success: prev.success + 1 };
-          return newStats;
-        });
+        setStats(prev => ({ ...prev, success: prev.success + 1 }));
         addLog(`✅ Sucesso para: ${data.to}`);
       } else {
-        setStats(prev => {
-          const newStats = { ...prev, error: prev.error + 1 };
-          return newStats;
-        });
+        setStats(prev => ({ ...prev, error: prev.error + 1 }));
         addLog(`❌ Erro para ${data.to}: ${data.error}`);
       }
     });
@@ -53,7 +47,6 @@ const Campaigns = () => {
     };
   }, []);
 
-  // Update context when local stats change
   useEffect(() => {
     if (currentCampaignId) {
       updateCampaignStats(currentCampaignId, { 
@@ -197,29 +190,6 @@ const Campaigns = () => {
           </div>
         </div>
 
-          <div className="form-section">
-            <label><Clock size={16} /> Intervalo entre envios (segundos)</label>
-            <input 
-              type="number" 
-              value={delay} 
-              onChange={(e) => setDelay(parseInt(e.target.value))}
-              min="1"
-            />
-            <p className="hint">Mantenha entre 30-60s para maior segurança.</p>
-          </div>
-
-          <div className="form-actions">
-            <button 
-              className={`btn-primary gradient-bg full-width ${isRunning ? 'disabled' : ''}`}
-              onClick={startCampaign}
-              disabled={isRunning}
-            >
-              <Play size={18} />
-              {isRunning ? 'Campanha em Execução...' : 'Iniciar Campanha'}
-            </button>
-          </div>
-        </div>
-
         <div className="campaign-status">
           <div className="status-overview glass">
             <h3>Progresso da Campanha</h3>
@@ -274,195 +244,6 @@ const Campaigns = () => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .campaigns-page {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .page-header {
-          margin-bottom: 2rem;
-        }
-
-        .campaign-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-        }
-
-        .campaign-form {
-          padding: 2rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .form-section {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .form-section label {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.7);
-        }
-
-        select, input, textarea {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid var(--glass-border);
-          border-radius: 8px;
-          padding: 0.75rem 1rem;
-          color: white;
-          font-size: 1rem;
-          outline: none;
-          transition: var(--transition);
-        }
-
-        select:focus, input:focus, textarea:focus {
-          border-color: var(--primary);
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        textarea {
-          min-height: 150px;
-          resize: vertical;
-        }
-
-        .template-preview-box {
-          background: rgba(0, 0, 0, 0.2);
-          padding: 1rem;
-          border-radius: 8px;
-          font-size: 0.875rem;
-          color: rgba(255, 255, 255, 0.5);
-          border: 1px dashed var(--glass-border);
-          max-height: 100px;
-          overflow-y: auto;
-          white-space: pre-wrap;
-        }
-
-        .variables-hint {
-          font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.4);
-          margin-top: 0.5rem;
-        }
-
-        .variables-hint code {
-          background: rgba(255, 255, 255, 0.1);
-          padding: 0.1rem 0.3rem;
-          border-radius: 4px;
-          color: var(--accent);
-        }
-
-        .hint {
-          font-size: 0.75rem;
-          color: var(--warning);
-          opacity: 0.8;
-        }
-
-        .full-width {
-          width: 100%;
-          justify-content: center;
-        }
-
-        .status-overview {
-          padding: 1.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .status-overview h3 {
-          font-size: 1rem;
-          margin-bottom: 1rem;
-        }
-
-        .progress-bar-container {
-          height: 8px;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 4px;
-          overflow: hidden;
-          margin-bottom: 0.5rem;
-        }
-
-        .progress-bar {
-          height: 100%;
-          background: var(--accent-gradient);
-          border-radius: 4px;
-          transition: width 0.3s ease;
-        }
-
-        .progress-stats {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        .stats-mini-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .stat-mini {
-          padding: 1rem;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .stat-icon {
-          color: var(--primary);
-        }
-
-        .stat-label {
-          display: block;
-          font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        .stat-val {
-          font-weight: 700;
-          font-size: 1rem;
-        }
-
-        .live-log {
-          padding: 1.5rem;
-          flex: 1;
-        }
-
-        .live-log h3 {
-          font-size: 1rem;
-          margin-bottom: 1rem;
-        }
-
-        .log-container {
-          height: 200px;
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 8px;
-          padding: 1rem;
-          font-family: monospace;
-          font-size: 0.875rem;
-          overflow-y: auto;
-        }
-
-        .log-placeholder {
-          color: rgba(255, 255, 255, 0.2);
-          text-align: center;
-          margin-top: 4rem;
-        }
-
-        @media (max-width: 900px) {
-          .campaign-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
     </div>
   );
 };
