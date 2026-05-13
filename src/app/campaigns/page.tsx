@@ -89,7 +89,14 @@ const Campaigns = () => {
     for (let i = 0; i < contacts.length; i++) {
       if (!isRunning && i > 0) break; 
       const contact = contacts[i];
-      const msg = template.content.replace(/{{nome}}/g, contact.name).replace(/{{telefone}}/g, contact.phone);
+      let msg = template.content;
+      
+      // Substituir todas as tags dinâmicas
+      customTags.forEach(tag => {
+        const regex = new RegExp(`{{${tag}}}`, 'g');
+        const value = (contact as any)[tag] || ''; 
+        msg = msg.replace(regex, value);
+      });
       
       socket?.emit('send-message', { instanceId: selectedInstanceId, to: contact.phone, message: msg });
       setProgress(Math.round(((i + 1) / contacts.length) * 100));

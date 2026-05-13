@@ -41,6 +41,7 @@ interface ContactContextType {
   templates: MessageTemplate[];
   campaigns: Campaign[];
   instances: WhatsAppInstance[];
+  customTags: string[];
   addContacts: (newContacts: Omit<Contact, 'id' | 'createdAt'>[]) => void;
   deleteContact: (id: string) => void;
   clearContacts: () => void;
@@ -51,6 +52,8 @@ interface ContactContextType {
   addInstance: (name: string) => void;
   deleteInstance: (id: string) => void;
   updateInstance: (id: string, updates: Partial<WhatsAppInstance>) => void;
+  addCustomTag: (tag: string) => void;
+  deleteCustomTag: (tag: string) => void;
 }
 
 const ContactContext = createContext<ContactContextType | undefined>(undefined);
@@ -60,6 +63,7 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [instances, setInstances] = useState<WhatsAppInstance[]>([]);
+  const [customTags, setCustomTags] = useState<string[]>(['nome', 'telefone']);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -67,11 +71,13 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const savedTemplates = localStorage.getItem('whatsapp-crm-templates');
     const savedCampaigns = localStorage.getItem('whatsapp-crm-campaigns');
     const savedInstances = localStorage.getItem('whatsapp-crm-instances');
+    const savedTags = localStorage.getItem('whatsapp-crm-tags');
     
     if (savedContacts) setContacts(JSON.parse(savedContacts));
     if (savedTemplates) setTemplates(JSON.parse(savedTemplates));
     if (savedCampaigns) setCampaigns(JSON.parse(savedCampaigns));
     if (savedInstances) setInstances(JSON.parse(savedInstances));
+    if (savedTags) setCustomTags(JSON.parse(savedTags));
   }, []);
 
   // Save to localStorage
@@ -90,6 +96,10 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem('whatsapp-crm-instances', JSON.stringify(instances));
   }, [instances]);
+
+  useEffect(() => {
+    localStorage.setItem('whatsapp-crm-tags', JSON.stringify(customTags));
+  }, [customTags]);
 
   const addContacts = (newContacts: Omit<Contact, 'id' | 'createdAt'>[]) => {
     const contactsWithIds = newContacts.map(c => ({
@@ -157,12 +167,25 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setInstances(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
   };
 
+  const addCustomTag = (tag: string) => {
+    const cleanTag = tag.replace(/[{}]/g, '').toLowerCase();
+    if (!customTags.includes(cleanTag)) {
+      setCustomTags(prev => [...prev, cleanTag]);
+    }
+  };
+
+  const deleteCustomTag = (tag: string) => {
+    if (tag === 'nome' || tag === 'telefone') return;
+    setCustomTags(prev => prev.filter(t => t !== tag));
+  };
+
   return (
     <ContactContext.Provider value={{ 
       contacts, 
       templates, 
       campaigns,
       instances,
+      customTags,
       addContacts, 
       deleteContact, 
       clearContacts,
@@ -172,7 +195,9 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updateCampaignStats,
       addInstance,
       deleteInstance,
-      updateInstance
+      updateInstance,
+      addCustomTag,
+      deleteCustomTag
     }}>
       {children}
     </ContactContext.Provider>

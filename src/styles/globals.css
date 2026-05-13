@@ -78,7 +78,7 @@ body {
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
-  gap: 2rem;
+  gap: 3rem; /* Espaçamento entre blocos aumentado */
   align-items: start;
 }
 
