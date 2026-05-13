@@ -58,70 +58,84 @@ const Settings = () => {
 
   return (
     <div className="settings-page">
-      <div className="card-header mb-8">
-        <h1 className="text-3xl font-extrabold">Configurações do <span style={{ color: 'var(--primary)' }}>Sistema</span></h1>
-        <p className="text-muted">Gerencie instâncias e configurações de infraestrutura.</p>
+      <div className="page-header mb-12">
+        <h1 className="text-4xl font-black mb-2">Configurações de <span style={{ color: 'var(--primary)' }}>Rede</span></h1>
+        <p className="text-muted text-lg">Gerencie instâncias de WhatsApp e conectividade global.</p>
       </div>
 
       <div className="grid-2">
         {/* Coluna Esquerda: Conectar Instância */}
         <div className="card">
-          <div className="card-header border-b border-white/5 pb-4 mb-6">
-            <h3 className="card-title flex items-center gap-2"><Smartphone size={18} /> Instâncias WhatsApp</h3>
-            <button className="btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem' }} onClick={() => setIsAdding(true)}>
-              <Plus size={14} /> Nova
+          <div className="card-header border-b border-white/5 pb-6 mb-10">
+            <h3 className="card-title flex items-center gap-3"><Smartphone size={22} className="text-primary" /> Instâncias</h3>
+            <button className="btn-primary" style={{ padding: '0.6rem 1rem', fontSize: '0.8rem' }} onClick={() => setIsAdding(true)}>
+              <Plus size={16} /> Adicionar
             </button>
           </div>
 
           {isAdding && (
-            <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-bold uppercase">Nome do Aparelho</span>
-                <button onClick={() => setIsAdding(false)}><X size={16} /></button>
+            <div className="p-8 bg-primary/5 border border-primary/20 rounded-2xl mb-10 animate-fade-in">
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Identificação</span>
+                <button onClick={() => setIsAdding(false)} className="text-muted hover:text-white"><X size={20} /></button>
               </div>
-              <input type="text" placeholder="Ex: Vendas 01" value={newName} onChange={(e) => setNewName(e.target.value)} />
-              <button className="btn-primary w-full" onClick={handleAdd}>Criar Instância</button>
+              <input type="text" placeholder="Ex: Vendas São Paulo" className="mb-4" value={newName} onChange={(e) => setNewName(e.target.value)} />
+              <button className="btn-primary w-full py-4" onClick={handleAdd}>Confirmar Criação</button>
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-8">
             {instances.length === 0 ? (
-              <p className="text-muted text-center py-20">Nenhuma instância operando.</p>
+              <div className="text-center py-32 opacity-10">
+                <Smartphone size={64} className="mx-auto mb-6" />
+                <p className="font-bold uppercase tracking-widest text-xs">Sem instâncias</p>
+              </div>
             ) : (
               instances.map((instance) => (
-                <div key={instance.id} className="p-5 bg-black/40 rounded-xl border border-white/5">
-                  <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-3">
-                      <Smartphone size={20} className="text-primary" />
+                <div key={instance.id} className="p-8 bg-black/40 rounded-3xl border border-white/10 hover:border-primary/20 transition-all">
+                  <div className="flex justify-between items-center mb-10">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                        <Smartphone size={24} />
+                      </div>
                       <div>
-                        <p className="font-bold text-sm">{instance.name}</p>
-                        <p className="text-[10px] text-muted">ID: {instance.id}</p>
+                        <p className="font-black text-lg tracking-tight">{instance.name}</p>
+                        <p className="text-[10px] text-muted font-bold tracking-widest uppercase">ID: {instance.id}</p>
                       </div>
                     </div>
-                    <button onClick={() => handleDelete(instance.id)} className="text-muted hover:text-error">
-                      <Trash2 size={16} />
+                    <button onClick={() => handleDelete(instance.id)} className="p-3 bg-white/5 hover:bg-error/10 hover:text-error rounded-xl transition-all">
+                      <Trash2 size={20} />
                     </button>
                   </div>
 
-                  <div className="flex flex-col items-center py-4">
+                  <div className="flex flex-col items-center py-10">
                     {instance.status === 'connected' ? (
-                      <div className="text-center text-success">
-                        <CheckCircle size={48} className="mx-auto mb-2" />
-                        <p className="font-bold text-sm">Conectado</p>
+                      <div className="text-center animate-fade-in">
+                        <div className="w-24 h-24 bg-success/10 rounded-full flex items-center justify-center mb-4 mx-auto border border-success/20">
+                          <CheckCircle size={48} className="text-success" />
+                        </div>
+                        <p className="font-black text-xl text-success tracking-tight">Ativo & Conectado</p>
+                        <p className="text-xs text-muted mt-1 uppercase font-bold tracking-widest">Tudo funcionando corretamente</p>
                       </div>
                     ) : instance.qrCode ? (
-                      <div className="text-center">
-                        <div className="bg-white p-2 rounded-xl inline-block mb-4">
-                          <img src={instance.qrCode} alt="QR Code" className="w-40 h-40" />
+                      <div className="text-center animate-scale-in">
+                        <div className="bg-white p-4 rounded-3xl inline-block mb-6 shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
+                          <img src={instance.qrCode} alt="QR Code" className="w-48 h-48" />
                         </div>
-                        <p className="text-xs font-bold">Escaneie para Conectar</p>
+                        <p className="text-base font-black tracking-tight mb-1">Aguardando Escaneamento</p>
+                        <p className="text-[10px] text-muted uppercase font-black tracking-widest">Abra o WhatsApp e aponte a câmera</p>
                       </div>
                     ) : (
                       <div className="text-center">
                         {instance.status === 'connecting' ? (
-                          <Loader2 className="animate-spin text-primary mx-auto mb-2" size={32} />
+                          <div className="flex flex-col items-center py-8">
+                            <Loader2 className="animate-spin text-primary mb-6" size={48} />
+                            <p className="text-sm font-black opacity-30 uppercase tracking-widest">Iniciando Servidor...</p>
+                          </div>
                         ) : (
-                          <button className="btn-primary" onClick={() => connectInstance(instance.id)}>Gerar QR Code</button>
+                          <button className="btn-primary px-12 py-5 shadow-[0_15px_30px_rgba(139,92,246,0.3)]" onClick={() => connectInstance(instance.id)}>
+                            Solicitar Token QR
+                          </button>
                         )}
                       </div>
                     )}
@@ -132,36 +146,38 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Coluna Direita: Outras Possibilidades */}
-        <div className="space-y-6">
+        {/* Coluna Direita: Outras Opções */}
+        <div className="space-y-8">
           <div className="card">
-            <div className="card-header border-b border-white/5 pb-4 mb-4">
-              <h3 className="card-title flex items-center gap-2"><Globe size={18} /> API & Webhooks</h3>
+            <div className="card-header border-b border-white/5 pb-6 mb-8">
+              <h3 className="card-title flex items-center gap-3"><Globe size={22} className="text-primary" /> API & Webhooks</h3>
             </div>
-            <p className="text-sm text-muted mb-4">Integre seu CRM com outras plataformas via Webhooks.</p>
-            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%' }}>
-              Configurar Webhooks (Em breve)
+            <p className="text-muted text-base leading-relaxed mb-8">Sincronize seus disparos com RD Station, HubSpot ou ActiveCampaign em tempo real.</p>
+            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%', py: '1.25rem' }}>
+              <span className="opacity-40 font-black uppercase tracking-widest text-xs">Configurações Avançadas (Em breve)</span>
             </button>
           </div>
 
           <div className="card">
-            <div className="card-header border-b border-white/5 pb-4 mb-4">
-              <h3 className="card-title flex items-center gap-2"><Lock size={18} /> Segurança</h3>
+            <div className="card-header border-b border-white/5 pb-6 mb-8">
+              <h3 className="card-title flex items-center gap-3"><Lock size={22} className="text-primary" /> Segurança</h3>
             </div>
-            <p className="text-sm text-muted mb-4">Proteja seu painel com autenticação em dois fatores.</p>
-            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%' }}>
-              Ativar 2FA (Em breve)
+            <p className="text-muted text-base leading-relaxed mb-8">Gerencie permissões de usuários e ative a autenticação de dois fatores (2FA).</p>
+            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%', py: '1.25rem' }}>
+              <span className="opacity-40 font-black uppercase tracking-widest text-xs">Módulos de Acesso (Em breve)</span>
             </button>
           </div>
 
           <div className="card">
-            <div className="card-header border-b border-white/5 pb-4 mb-4">
-              <h3 className="card-title flex items-center gap-2"><Server size={18} /> Logs do Sistema</h3>
+            <div className="card-header border-b border-white/5 pb-6 mb-8">
+              <h3 className="card-title flex items-center gap-3"><Server size={22} className="text-primary" /> Console do Servidor</h3>
             </div>
-            <div className="bg-black p-3 rounded font-mono text-[10px] text-success h-32 overflow-y-auto">
-              [SYSTEM] Servidor Node.js rodando na porta 3001<br/>
-              [SYSTEM] Monitor de instâncias ativo<br/>
-              [SYSTEM] Aguardando conexões...
+            <div className="bg-black/80 p-6 rounded-2xl font-mono text-[11px] text-success/80 h-48 overflow-y-auto leading-loose border border-white/5">
+              <span className="opacity-40">[05:12:01]</span> WhatsApp Server Core v2.1.0<br/>
+              <span className="opacity-40">[05:12:02]</span> Conectado ao Gateway Principal<br/>
+              <span className="opacity-40">[05:12:02]</span> Pool de conexões otimizado<br/>
+              <span className="opacity-40">[05:12:05]</span> Monitorando instâncias ativas...<br/>
+              <span className="opacity-40">[05:12:10]</span> Sistema pronto para disparos.
             </div>
           </div>
         </div>
