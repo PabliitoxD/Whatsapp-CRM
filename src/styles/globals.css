@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --background: #050505;
-  --sidebar-bg: #0a0a0b;
-  --card-bg: #0f0f12;
-  --border: rgba(255, 255, 255, 0.05);
+  --background: #09090b;
+  --sidebar-bg: #111114;
+  --card-bg: #16161a;
+  --border: rgba(255, 255, 255, 0.06);
   --primary: #8b5cf6;
-  --primary-glow: rgba(139, 92, 246, 0.15);
+  --primary-hover: #7c3aed;
   --text-main: #ffffff;
-  --text-muted: #71717a;
-  --sidebar-width: 320px;
+  --text-muted: #a1a1aa;
+  --sidebar-width: 280px;
   --success: #10b981;
   --error: #ef4444;
 }
@@ -18,66 +18,52 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: 'Outfit', sans-serif; /* Fonte mais moderna e premium */
+  font-family: 'Outfit', sans-serif;
 }
 
 body {
   background-color: var(--background);
   color: var(--text-main);
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
-/* Layout Estrutural */
 .main-content {
   margin-left: var(--sidebar-width);
-  padding: 8rem 6rem; /* Espaçamento de elite */
-  max-width: calc(100vw - var(--sidebar-width));
+  padding: 4rem 5rem; /* Espaçamento luxuoso mas funcional */
+  min-height: 100vh;
 }
 
-/* --- COMPONENTES ULTRA PREMIUM --- */
+/* --- COMPONENTES PADRONIZADOS --- */
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 6rem; /* Mais espaço */
-  padding-bottom: 3rem;
+  align-items: center;
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
   border-bottom: 1px solid var(--border);
 }
 
 .page-header h1 {
-  font-size: 4rem; /* Gigante e imponente */
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.9;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 40px; /* Mais arredondado */
-  position: relative;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
-}
-
-.card::after { /* Brilho sutil no topo */
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .card-inner {
-  padding: 5rem; /* Padding interno gigante */
+  padding: 3rem; /* Espaço generoso */
 }
 
 .card-header-unified {
-  padding: 3rem 5rem; /* Acompanha o padding do card */
+  padding: 1.75rem 3rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -88,109 +74,111 @@ body {
 .card-title-group {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .card-title-group h3 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .card-icon-box {
-  width: 60px; /* Maior */
-  height: 60px;
-  background: var(--primary-glow);
+  width: 48px;
+  height: 48px;
+  background: rgba(139, 92, 246, 0.1);
   color: var(--primary);
-  border-radius: 20px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
-/* Botões de Luxo */
 .btn-primary {
   background: var(--primary);
   color: white;
   border: none;
-  padding: 1.75rem 3.5rem; /* Botões muito maiores */
-  border-radius: 20px;
-  font-weight: 900;
-  font-size: 1rem;
+  padding: 1.1rem 2.2rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  gap: 0.75rem;
+  transition: all 0.2s;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+  letter-spacing: 0.05em;
 }
 
 .btn-primary:hover {
-  transform: translateY(-5px) scale(1.02);
   background: var(--primary-hover);
-  box-shadow: 0 30px 60px rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
 }
 
-/* Inputs Premium */
 .input-group label {
-  font-size: 0.85rem;
-  font-weight: 900;
+  font-size: 0.75rem;
+  font-weight: 800;
   color: var(--text-muted);
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.15em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 input, select, textarea {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 1.75rem 2rem;
+  border-radius: 14px;
+  padding: 1.1rem 1.5rem;
   color: white;
-  font-size: 1.1rem;
-  transition: all 0.3s;
+  font-size: 1rem;
 }
 
-/* Grids e Tabelas */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1.6fr;
-  gap: 8rem; /* Espaço massivo */
+  gap: 3rem;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 3rem;
-  margin-bottom: 8rem;
+  gap: 2rem;
+  margin-bottom: 4rem;
 }
 
-th {
-  padding: 2.5rem 3rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.15em;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-td {
-  padding: 3rem; /* Células gigantes */
-  font-size: 1.1rem;
-}
-
-/* Sidebar Ultra */
+/* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
   background: var(--sidebar-bg);
-  padding: 6rem 3rem;
   border-right: 1px solid var(--border);
+  padding: 3rem 1.5rem;
+  z-index: 100;
 }
 
 .nav-item {
-  padding: 1.5rem 2rem;
-  margin-bottom: 1.5rem;
-  border-radius: 20px;
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+  border-radius: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+  background: rgba(255, 255, 255, 0.04);
+  color: white;
+}
+
+.nav-item.active {
+  background: var(--primary);
+  color: white;
 }
