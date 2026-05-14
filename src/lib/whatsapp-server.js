@@ -31,30 +31,37 @@ const createInstance = (instanceId, socket) => {
     }),
     puppeteer: {
       headless: true,
+      executablePath: process.env.NODE_ENV === 'production' ? '/usr/bin/chromium' : undefined,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage'
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // <- Corrigir problemas de memória em Docker
+        '--disable-gpu'
       ],
     }
   });
 
   const instanceData = {
     client,
-    status: 'disconnected',
+    status: 'connecting', // Começa como conectando para mostrar o loader
     id: instanceId
   };
 
   clients.set(instanceId, instanceData);
+  io.emit('instance-status', { id: instanceId, status: 'connecting' });
 
   client.on('qr', async (qr) => {
-    console.log(`QR RECEIVED for ${instanceId}`);
+    console.log(`[${instanceId}] QR RECEIVED`);
     instanceData.status = 'connecting';
     try {
       const qrDataURL = await QRCode.toDataURL(qr);
       io.emit('instance-qr', { id: instanceId, qr: qrDataURL });
     } catch (err) {
-      console.error('QR Generation error:', err);
+      console.error(`[${instanceId}] QR Generation error:`, err);
     }
   });
 

@@ -58,12 +58,14 @@ COPY . .
 # Build the Next.js application
 RUN npm run build
 
+# Set environment to production
+ENV NODE_ENV=production
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 # Expose ports (3000 for Next.js, 3001 for WhatsApp Socket)
 EXPOSE 3000
 EXPOSE 3001
-
-# Set environment to production
-ENV NODE_ENV=production
 
 # Start the application in production mode
 CMD ["npm", "run", "start"]
