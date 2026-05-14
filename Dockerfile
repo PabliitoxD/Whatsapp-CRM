@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y \
     libnss3 \
     lsb-release \
     xdg-utils \
-    wget \
+    chromium \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory

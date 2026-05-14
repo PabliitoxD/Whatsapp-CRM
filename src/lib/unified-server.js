@@ -51,6 +51,12 @@ app.prepare().then(() => {
     addLog(`Iniciando criação da instância: ${instanceId}`);
     
     try {
+      const executablePath = process.env.NODE_ENV === 'production' 
+        ? ['/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome-stable', '/usr/bin/google-chrome'].find(path => require('fs').existsSync(path))
+        : undefined;
+
+      addLog(`Caminho do Chromium detectado: ${executablePath || 'Padrão Puppeteer'}`);
+
       const client = new Client({
         authStrategy: new LocalAuth({
           clientId: instanceId,
@@ -58,7 +64,7 @@ app.prepare().then(() => {
         }),
         puppeteer: {
           headless: true,
-          executablePath: process.env.NODE_ENV === 'production' ? '/usr/bin/chromium' : undefined,
+          executablePath: executablePath,
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
