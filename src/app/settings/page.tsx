@@ -19,6 +19,14 @@ const Settings = () => {
   const [newName, setNewName] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  // Auto-abre o modal se vier redirecionado com o parâmetro 'new'
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('new') === 'true') {
+      setIsAdding(true);
+    }
+  }, []);
+
   // Monitoramento de Sockets para QR Code e Status de Conexão
   useEffect(() => {
     const newSocket = io('http://localhost:3001');
@@ -41,7 +49,8 @@ const Settings = () => {
 
   const handleAdd = () => {
     if (!newName) return;
-    addInstance(newName);
+    const id = addInstance(newName);
+    connectInstance(id);
     setNewName('');
     setIsAdding(false);
   };

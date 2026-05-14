@@ -49,7 +49,7 @@ interface ContactContextType {
   deleteTemplate: (id: string) => void;
   addCampaign: (campaign: Omit<Campaign, 'id' | 'createdAt' | 'status' | 'success' | 'error'>) => string;
   updateCampaignStats: (id: string, stats: Partial<Pick<Campaign, 'success' | 'error' | 'status'>>) => void;
-  addInstance: (name: string) => void;
+  addInstance: (name: string) => string;
   deleteInstance: (id: string) => void;
   updateInstance: (id: string, updates: Partial<WhatsAppInstance>) => void;
   addCustomTag: (tag: string) => void;
@@ -150,13 +150,15 @@ export const ContactProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const addInstance = (name: string) => {
+    const id = Math.random().toString(36).substr(2, 9);
     const newInstance: WhatsAppInstance = {
-      id: Math.random().toString(36).substr(2, 9),
+      id,
       name,
       status: 'disconnected',
       createdAt: new Date().toISOString(),
     };
     setInstances(prev => [...prev, newInstance]);
+    return id;
   };
 
   const deleteInstance = (id: string) => {

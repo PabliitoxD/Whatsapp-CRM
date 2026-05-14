@@ -18,6 +18,14 @@ const Templates = () => {
   const [newName, setNewName] = useState('');
   const [newContent, setNewContent] = useState('');
 
+  // Auto-abre o modal se vier redirecionado com o parâmetro 'new'
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('new') === 'true') {
+      setShowModal(true);
+    }
+  }, []);
+
   // Salva o novo modelo e fecha o modal
   const handleSave = () => {
     if (!newName || !newContent) return;

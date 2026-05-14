@@ -150,7 +150,7 @@ const Campaigns = () => {
             <div className="input-group">
               <label>Caminho de Saída (Aparelho)</label>
               {instances.length === 0 ? (
-                <UIButton onClick={() => router.push('/settings')} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                <UIButton onClick={() => router.push('/settings?new=true')} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
                   Nenhum aparelho cadastrado. Adicionar?
                 </UIButton>
               ) : (
@@ -168,7 +168,7 @@ const Campaigns = () => {
             <div className="input-group">
               <label>Engenharia de Mensagem (Modelo)</label>
               {templates.length === 0 ? (
-                <UIButton onClick={() => router.push('/templates')} style={{ width: '100%', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                <UIButton onClick={() => router.push('/templates?new=true')} style={{ width: '100%', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
                   Nenhum modelo cadastrado. Criar agora?
                 </UIButton>
               ) : (

@@ -1,6 +1,7 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const { Server } = require('socket.io');
 const http = require('http');
+const QRCode = require('qrcode');
 
 const port = 3001;
 const server = http.createServer();
@@ -46,10 +47,15 @@ const createInstance = (instanceId, socket) => {
 
   clients.set(instanceId, instanceData);
 
-  client.on('qr', (qr) => {
+  client.on('qr', async (qr) => {
     console.log(`QR RECEIVED for ${instanceId}`);
     instanceData.status = 'connecting';
-    io.emit('instance-qr', { id: instanceId, qr });
+    try {
+      const qrDataURL = await QRCode.toDataURL(qr);
+      io.emit('instance-qr', { id: instanceId, qr: qrDataURL });
+    } catch (err) {
+      console.error('QR Generation error:', err);
+    }
   });
 
   client.on('ready', () => {
