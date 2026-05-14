@@ -9,7 +9,7 @@
   --primary-hover: #7c3aed;
   --text-main: #ffffff;
   --text-muted: #a1a1aa;
-  --sidebar-width: 300px; /* Aumentado */
+  --sidebar-width: 280px;
   --success: #10b981;
   --error: #ef4444;
 }
@@ -28,113 +28,123 @@ body {
   overflow-x: hidden;
 }
 
-.app-container {
-  display: flex;
-}
-
 .main-content {
-  flex: 1;
   margin-left: var(--sidebar-width);
-  padding: 6rem 5rem; /* Aumentado drasticamente */
+  padding: 5rem; /* Padronizado */
   max-width: calc(100vw - var(--sidebar-width));
 }
 
-/* Sidebar */
-.sidebar {
-  width: var(--sidebar-width);
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
-  padding: 4rem 2rem; /* Mais espaço */
-  z-index: 100;
-}
+/* --- COMPONENTES PADRONIZADOS --- */
 
-.nav-item {
+/* 1. Page Header (Título + Botões da Direita) */
+.page-header {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.25rem 1.5rem; /* Botões da sidebar maiores */
-  margin-bottom: 1rem;
-  border-radius: 16px;
-  color: var(--text-muted);
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  justify-content: space-between;
+  align-items: flex-end; /* Alinhamento pela base */
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.nav-item:hover, .nav-item.active {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+.page-header h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
-.nav-item.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
-}
-
-/* Grid Principal */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1.6fr;
-  gap: 6rem; /* Espaço gigante entre blocos */
-  align-items: start;
-}
-
-/* Cards Premium */
+/* 2. Cards e Seus Cabeçalhos */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 32px; /* Super arredondado */
-  padding: 4rem; /* Padding interno gigante */
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  transition: transform 0.3s ease;
+  border-radius: 24px;
+  padding: 0; /* O conteúdo interno decide o padding */
+  overflow: hidden;
+  height: 100%;
 }
 
-.card-header {
-  margin-bottom: 3.5rem; /* Mais espaço para o conteúdo */
+.card-inner {
+  padding: 2.5rem;
+}
+
+.card-header-unified {
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: rgba(255, 255, 255, 0.01);
 }
 
-.card-title {
-  font-size: 1.5rem;
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-title-group h3 {
+  font-size: 1.25rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.card-icon-box {
+  width: 42px;
+  height: 42px;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3. Botões Congruentes */
+.btn-primary {
+  background: var(--primary);
   color: white;
-  letter-spacing: -0.03em;
+  border: none;
+  padding: 1.25rem 2rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
-/* Stats Grid do Dashboard */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2.5rem; /* Mais espaço entre mini-cards */
-  margin-bottom: 6rem;
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
 }
 
-/* Inputs, Selects e Botões (O "corpo" do sistema) */
-label {
+/* 4. Inputs e Campos */
+.input-group {
+  margin-bottom: 2rem;
+}
+
+.input-group label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 1rem;
-  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
 }
 
 input, select, textarea {
   width: 100%;
-  background: #000000;
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.5rem 1.75rem; /* Inputs muito mais altos */
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
   color: white;
-  margin-bottom: 2rem; /* Mais espaço vertical */
   outline: none;
   font-size: 1rem;
   transition: all 0.2s;
@@ -145,36 +155,45 @@ input:focus {
   background: rgba(139, 92, 246, 0.05);
 }
 
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 1.5rem 3rem; /* Botões grandes e luxuosos */
-  border-radius: 16px;
-  font-weight: 800;
-  font-size: 1rem;
-  cursor: pointer;
+/* 5. Layout de Grid */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+/* 6. Empty States Padronizados */
+.empty-state {
+  padding: 5rem 2rem;
+  text-align: center;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  transition: all 0.3s;
+  opacity: 0.3;
+}
+
+.empty-state-icon {
+  margin-bottom: 1.5rem;
+  color: var(--text-muted);
+}
+
+.empty-state p {
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
 }
 
-.btn-primary:hover { 
-  background: var(--primary-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
-}
-
-/* Tabelas Ultra-Espaçadas */
-.table-container {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
+/* Tabelas */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -182,43 +201,17 @@ table {
 
 th {
   text-align: left;
-  padding: 1.75rem 2rem;
+  padding: 1.5rem 2rem;
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  font-weight: 900;
+  font-weight: 800;
   border-bottom: 1px solid var(--border);
-  letter-spacing: 0.1em;
+  background: rgba(255, 255, 255, 0.01);
 }
 
 td {
-  padding: 2.5rem 2rem; /* Células com muito espaço vertical */
+  padding: 1.75rem 2rem;
   border-bottom: 1px solid var(--border);
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.95rem;
 }
-
-/* Modais */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--card-bg);
-  width: 90%;
-  max-width: 800px;
-  padding: 5rem; /* Modal muito mais espaçoso */
-  border-radius: 40px;
-  border: 1px solid var(--border);
-}
-
-/* Utilitários de Margem */
-.mb-12 { margin-bottom: 5rem !important; }
-.mt-12 { margin-top: 5rem !important; }
