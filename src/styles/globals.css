@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --background: #0a0a0b;
-  --sidebar-bg: #111114;
-  --card-bg: #16161a;
-  --border: rgba(255, 255, 255, 0.08);
+  --background: #050505;
+  --sidebar-bg: #0a0a0b;
+  --card-bg: #0f0f12;
+  --border: rgba(255, 255, 255, 0.05);
   --primary: #8b5cf6;
-  --primary-hover: #7c3aed;
+  --primary-glow: rgba(139, 92, 246, 0.15);
   --text-main: #ffffff;
-  --text-muted: #a1a1aa;
-  --sidebar-width: 280px;
+  --text-muted: #71717a;
+  --sidebar-width: 320px;
   --success: #10b981;
   --error: #ef4444;
 }
@@ -18,7 +18,7 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif; /* Fonte mais moderna e premium */
 }
 
 body {
@@ -28,46 +28,56 @@ body {
   overflow-x: hidden;
 }
 
+/* Layout Estrutural */
 .main-content {
   margin-left: var(--sidebar-width);
-  padding: 5rem; /* Padronizado */
+  padding: 8rem 6rem; /* Espaçamento de elite */
   max-width: calc(100vw - var(--sidebar-width));
 }
 
-/* --- COMPONENTES PADRONIZADOS --- */
+/* --- COMPONENTES ULTRA PREMIUM --- */
 
-/* 1. Page Header (Título + Botões da Direita) */
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end; /* Alinhamento pela base */
-  margin-bottom: 4rem;
-  padding-bottom: 2rem;
+  align-items: flex-end;
+  margin-bottom: 6rem; /* Mais espaço */
+  padding-bottom: 3rem;
   border-bottom: 1px solid var(--border);
 }
 
 .page-header h1 {
-  font-size: 3rem;
+  font-size: 4rem; /* Gigante e imponente */
   font-weight: 900;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
 }
 
-/* 2. Cards e Seus Cabeçalhos */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 0; /* O conteúdo interno decide o padding */
+  border-radius: 40px; /* Mais arredondado */
+  position: relative;
   overflow: hidden;
-  height: 100%;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+}
+
+.card::after { /* Brilho sutil no topo */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
 }
 
 .card-inner {
-  padding: 2.5rem;
+  padding: 5rem; /* Padding interno gigante */
 }
 
 .card-header-unified {
-  padding: 2rem 2.5rem;
+  padding: 3rem 5rem; /* Acompanha o padding do card */
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -78,140 +88,109 @@ body {
 .card-title-group {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .card-title-group h3 {
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .card-icon-box {
-  width: 42px;
-  height: 42px;
-  background: rgba(139, 92, 246, 0.1);
+  width: 60px; /* Maior */
+  height: 60px;
+  background: var(--primary-glow);
   color: var(--primary);
-  border-radius: 12px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
-/* 3. Botões Congruentes */
+/* Botões de Luxo */
 .btn-primary {
   background: var(--primary);
   color: white;
   border: none;
-  padding: 1.25rem 2rem;
-  border-radius: 14px;
-  font-weight: 800;
-  font-size: 0.9rem;
+  padding: 1.75rem 3.5rem; /* Botões muito maiores */
+  border-radius: 20px;
+  font-weight: 900;
+  font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  transition: all 0.3s;
+  gap: 1rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
+  letter-spacing: 0.1em;
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+  transform: translateY(-5px) scale(1.02);
+  background: var(--primary-hover);
+  box-shadow: 0 30px 60px rgba(139, 92, 246, 0.4);
 }
 
-/* 4. Inputs e Campos */
-.input-group {
-  margin-bottom: 2rem;
-}
-
+/* Inputs Premium */
 .input-group label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 900;
   color: var(--text-muted);
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.15em;
 }
 
 input, select, textarea {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.25rem 1.5rem;
+  border-radius: 20px;
+  padding: 1.75rem 2rem;
   color: white;
-  outline: none;
-  font-size: 1rem;
-  transition: all 0.2s;
+  font-size: 1.1rem;
+  transition: all 0.3s;
 }
 
-input:focus {
-  border-color: var(--primary);
-  background: rgba(139, 92, 246, 0.05);
-}
-
-/* 5. Layout de Grid */
+/* Grids e Tabelas */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1.6fr;
-  gap: 3rem;
-  align-items: start;
+  gap: 8rem; /* Espaço massivo */
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-  margin-bottom: 4rem;
-}
-
-/* 6. Empty States Padronizados */
-.empty-state {
-  padding: 5rem 2rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.3;
-}
-
-.empty-state-icon {
-  margin-bottom: 1.5rem;
-  color: var(--text-muted);
-}
-
-.empty-state p {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.8rem;
-}
-
-/* Tabelas */
-table {
-  width: 100%;
-  border-collapse: collapse;
+  gap: 3rem;
+  margin-bottom: 8rem;
 }
 
 th {
-  text-align: left;
-  padding: 1.5rem 2rem;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  font-weight: 800;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.01);
+  padding: 2.5rem 3rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 td {
-  padding: 1.75rem 2rem;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.95rem;
+  padding: 3rem; /* Células gigantes */
+  font-size: 1.1rem;
+}
+
+/* Sidebar Ultra */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  padding: 6rem 3rem;
+  border-right: 1px solid var(--border);
+}
+
+.nav-item {
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
 }
