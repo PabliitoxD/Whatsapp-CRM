@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Users, Send, Smartphone, AlertCircle, BarChart3, Plus } from 'lucide-react';
 import { useContacts } from '../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
@@ -17,6 +18,7 @@ const Dashboard = () => {
   // Dados globais do contexto (Contatos, Campanhas, Instâncias)
   const { contacts, campaigns, instances, updateInstance } = useContacts();
   const [socket, setSocket] = useState<Socket | null>(null);
+  const router = useRouter();
 
   // Inicialização do Socket para monitoramento em tempo real das instâncias
   useEffect(() => {
@@ -55,10 +57,10 @@ const Dashboard = () => {
 
       {/* Ações Rápidas: Acesso imediato às funções principais solicitadas */}
       <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '4rem' }}>
-        <UIButton onClick={() => window.location.href = '/templates'} style={{ flex: 1, height: '80px', fontSize: '1rem' }}>
+        <UIButton onClick={() => router.push('/templates')} style={{ flex: 1, height: '80px', fontSize: '1rem' }}>
           <Plus size={20} /> Criar Novo Template
         </UIButton>
-        <UIButton onClick={() => window.location.href = '/settings'} style={{ flex: 1, height: '80px', fontSize: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}>
+        <UIButton onClick={() => router.push('/settings')} style={{ flex: 1, height: '80px', fontSize: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}>
           <Plus size={20} /> Adicionar Nova Instância
         </UIButton>
       </div>

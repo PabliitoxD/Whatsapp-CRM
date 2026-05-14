@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Send, Play, BarChart2, Smartphone, History, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
@@ -35,6 +36,7 @@ const Campaigns = () => {
   const [stats, setStats] = useState({ total: 0, success: 0, error: 0 });
   const [logs, setLogs] = useState<string[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const router = useRouter();
 
   // Conexão com o servidor de sockets para status em tempo real
   useEffect(() => {
@@ -148,7 +150,7 @@ const Campaigns = () => {
             <div className="input-group">
               <label>Caminho de Saída (Aparelho)</label>
               {instances.length === 0 ? (
-                <UIButton onClick={() => window.location.href = '/settings'} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                <UIButton onClick={() => router.push('/settings')} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
                   Nenhum aparelho cadastrado. Adicionar?
                 </UIButton>
               ) : (
@@ -166,7 +168,7 @@ const Campaigns = () => {
             <div className="input-group">
               <label>Engenharia de Mensagem (Modelo)</label>
               {templates.length === 0 ? (
-                <UIButton onClick={() => window.location.href = '/templates'} style={{ width: '100%', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                <UIButton onClick={() => router.push('/templates')} style={{ width: '100%', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
                   Nenhum modelo cadastrado. Criar agora?
                 </UIButton>
               ) : (
