@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Send, Play, BarChart2, Smartphone, History, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Send, Play, BarChart2, Smartphone, History, CheckCircle, AlertCircle, Clock, X } from 'lucide-react';
 import { useContacts } from '../../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
 import { PageHeader, UICard, UIButton } from '../../components/UIComponents';
@@ -22,7 +22,8 @@ const Campaigns = () => {
     campaigns, 
     customTags, 
     addCampaign, 
-    updateCampaignStats 
+    updateCampaignStats,
+    deleteCustomTag
   } = useContacts();
   
   // Estados locais para configuração do envio
@@ -269,7 +270,7 @@ const Campaigns = () => {
                         <X size={16} />
                       </button>
                     ) : (
-                      <CheckCircle2 size={18} style={{ color: 'var(--success)', opacity: 0.6 }} />
+                      <CheckCircle size={18} style={{ color: 'var(--success)', opacity: 0.6 }} />
                     )}
                   </div>
                 </div>
