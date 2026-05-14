@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, Send, Smartphone, AlertCircle, BarChart3 } from 'lucide-react';
+import { Users, Send, Smartphone, AlertCircle, BarChart3, Plus } from 'lucide-react';
 import { useContacts } from '../lib/ContactContext';
 import { io, Socket } from 'socket.io-client';
-import { PageHeader, StatCard, UICard } from '../components/UIComponents';
+import { PageHeader, StatCard, UICard, UIButton } from '../components/UIComponents';
 
 /**
  * PÁGINA: DASHBOARD (VISÃO GERAL)
