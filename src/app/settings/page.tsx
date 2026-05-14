@@ -29,12 +29,7 @@ const Settings = () => {
 
   // Monitoramento de Sockets para QR Code e Status de Conexão
   useEffect(() => {
-    // Determina a URL do socket dinamicamente para funcionar tanto local quanto remoto
-    const socketUrl = typeof window !== 'undefined' 
-      ? `${window.location.protocol}//${window.location.hostname}:3001` 
-      : 'http://localhost:3001';
-      
-    const newSocket = io(socketUrl);
+    const newSocket = io();
     setSocket(newSocket);
 
     // Recebe o QR Code gerado pelo backend

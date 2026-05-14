@@ -41,11 +41,7 @@ const Campaigns = () => {
 
   // Conexão com o servidor de sockets para status em tempo real
   useEffect(() => {
-    const socketUrl = typeof window !== 'undefined' 
-      ? `${window.location.protocol}//${window.location.hostname}:3001` 
-      : 'http://localhost:3001';
-      
-    const newSocket = io(socketUrl);
+    const newSocket = io();
     setSocket(newSocket);
 
     // Quando uma mensagem é disparada com sucesso ou falha

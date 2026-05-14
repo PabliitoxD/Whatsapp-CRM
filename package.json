@@ -7,7 +7,7 @@
     "next": "next dev",
     "whatsapp": "node src/lib/whatsapp-server.js",
     "build": "next build",
-    "start": "concurrently \"next start\" \"npm run whatsapp\"",
+    "start": "node src/lib/unified-server.js",
     "lint": "eslint"
   },
   "dependencies": {
