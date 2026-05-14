@@ -32,33 +32,36 @@ const Templates = () => {
 
   return (
     <div className="templates-page">
-      <div className="page-header mb-12 flex justify-between items-center">
+      <div className="page-header mb-12 flex justify-between items-end pb-8 border-b border-white/5">
         <div>
-          <h1 className="text-4xl font-black">Modelos de <span style={{ color: 'var(--primary)' }}>Conversa</span></h1>
-          <p className="text-muted text-lg mt-2">Padronize sua comunicação e otimize seus resultados.</p>
+          <h1 className="text-5xl font-black mb-4">Modelos <span style={{ color: 'var(--primary)' }}>Master</span></h1>
+          <p className="text-muted text-xl mt-2">Engenharia de mensagens para conversão em massa.</p>
         </div>
         <button className="btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={20} /> Criar Template
+          <Plus size={24} /> Criar Template Estratégico
         </button>
       </div>
 
       {/* Modal de Criação */}
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '750px' }}>
-            <div className="flex justify-between items-center mb-10">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <MessageSquare size={24} />
+          <div className="modal-content" style={{ maxWidth: '900px' }}>
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                  <MessageSquare size={32} />
                 </div>
-                <h3 className="text-3xl font-black tracking-tight">Novo Modelo</h3>
+                <div>
+                  <h3 className="text-4xl font-black tracking-tight">Novo Modelo</h3>
+                  <p className="text-muted font-bold uppercase text-[10px] tracking-widest mt-1">Defina sua estratégia de comunicação</p>
+                </div>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-muted hover:text-white p-3 hover:bg-white/5 rounded-xl transition-all">
-                <X size={28} />
+              <button onClick={() => setShowModal(false)} className="text-muted hover:text-white p-4 hover:bg-white/5 rounded-2xl transition-all">
+                <X size={36} />
               </button>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-10">
               <div>
                 <label>Identificação do Modelo</label>
                 <input 
@@ -71,29 +74,29 @@ const Templates = () => {
               </div>
 
               <div>
-                <div className="flex justify-between items-end mb-3">
-                  <label>Conteúdo da Mensagem</label>
-                  <span className="text-[10px] font-black text-muted opacity-40 uppercase tracking-widest">{newContent.length} caracteres</span>
+                <div className="flex justify-between items-end mb-4">
+                  <label>Conteúdo da Mensagem Estratégica</label>
+                  <span className="text-[10px] font-black text-muted opacity-50 uppercase tracking-widest">{newContent.length} caracteres digitados</span>
                 </div>
                 <textarea 
                   rows={8}
                   placeholder="Olá {{nome}}, vimos que você esqueceu seus itens..." 
                   value={newContent}
-                  style={{ height: '220px', fontSize: '1rem', lineHeight: '1.7', padding: '1.5rem' }}
+                  style={{ height: '280px', fontSize: '1.1rem', lineHeight: '1.8', padding: '2.5rem' }}
                   onChange={(e) => setNewContent(e.target.value)}
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 mb-4">
-                  <TagIcon size={14} className="text-primary" /> Tags Disponíveis
+                <label className="flex items-center gap-3 mb-6">
+                  <TagIcon size={18} className="text-primary" /> Variáveis Disponíveis (Clique para inserir)
                 </label>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-4" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                   {customTags.map((tag) => (
                     <button 
                       key={tag}
                       onClick={() => insertTag(tag)}
-                      className="px-4 py-2 bg-black rounded-xl border border-white/5 text-xs font-black text-primary hover:bg-primary hover:text-white transition-all"
+                      className="px-6 py-3 bg-black rounded-2xl border border-white/5 text-sm font-black text-primary hover:bg-primary hover:text-white transition-all shadow-lg"
                     >
                       {'{'}{'{'}{tag}{'}'}{'}'}
                     </button>
@@ -101,49 +104,49 @@ const Templates = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-4 pt-8 border-t border-white/5">
-                <button className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--border)' }} onClick={() => setShowModal(false)}>Cancelar</button>
-                <button className="btn-primary px-10" onClick={handleSave}>Salvar Template</button>
+              <div className="flex justify-end gap-6 pt-10 border-t border-white/5" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1.5rem' }}>
+                <button className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--border)', minWidth: '180px' }} onClick={() => setShowModal(false)}>Cancelar</button>
+                <button className="btn-primary px-16" onClick={handleSave}>Salvar Template</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '3rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(450px, 1fr))', gap: '4rem' }}>
         {templates.length === 0 ? (
-          <div className="card text-center py-32 col-span-full">
-            <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-8">
-              <FileText size={40} className="opacity-10" />
+          <div className="card text-center py-48 col-span-full">
+            <div className="w-24 h-24 bg-white/5 rounded-[40px] flex items-center justify-center mx-auto mb-10">
+              <FileText size={48} className="opacity-10" />
             </div>
-            <h3 className="text-2xl font-black opacity-20 uppercase tracking-widest">Nenhum Modelo Encontrado</h3>
-            <p className="text-muted opacity-20 mt-3 font-medium">Crie seu primeiro modelo de mensagem para começar.</p>
+            <h3 className="text-3xl font-black opacity-20 uppercase tracking-widest">Nenhuma Estratégia Ativa</h3>
+            <p className="text-muted opacity-20 mt-4 text-lg font-medium">Inicie sua automação criando seu primeiro modelo de mensagem.</p>
           </div>
         ) : (
           templates.map((template) => (
             <div key={template.id} className="card group hover:border-primary/40 transition-all">
-              <div className="flex justify-between items-start mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 rounded-xl text-primary">
-                    <MessageSquare size={20} />
+              <div className="flex justify-between items-start mb-10" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="flex items-center gap-5">
+                  <div className="p-4 bg-primary/10 rounded-2xl text-primary border border-primary/10">
+                    <MessageSquare size={24} />
                   </div>
-                  <h4 className="font-black text-lg tracking-tight">{template.name}</h4>
+                  <h4 className="font-black text-xl tracking-tight">{template.name}</h4>
                 </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                  <button className="p-2.5 hover:bg-white/5 rounded-xl text-muted">
-                    <Copy size={18} />
+                <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
+                  <button className="p-3.5 hover:bg-white/5 rounded-2xl text-muted">
+                    <Copy size={22} />
                   </button>
-                  <button onClick={() => deleteTemplate(template.id)} className="p-2.5 hover:bg-error/10 rounded-xl text-muted hover:text-error transition-colors">
-                    <Trash2 size={18} />
+                  <button onClick={() => deleteTemplate(template.id)} className="p-3.5 hover:bg-error/10 rounded-2xl text-muted hover:text-error transition-colors">
+                    <Trash2 size={22} />
                   </button>
                 </div>
               </div>
-              <div className="p-6 bg-black/40 rounded-2xl border border-white/5 text-base text-muted leading-relaxed font-medium min-h-[120px]">
+              <div className="p-8 bg-black/40 rounded-[32px] border border-white/5 text-lg text-muted leading-relaxed font-medium min-h-[160px]">
                 {template.content}
               </div>
-              <div className="mt-8 flex justify-between items-center text-[10px] text-muted font-black uppercase tracking-widest opacity-30">
-                <span className="flex items-center gap-2"><TagIcon size={12} /> {template.content.length} caracteres</span>
-                <span>{new Date(template.createdAt).toLocaleDateString()}</span>
+              <div className="mt-10 flex justify-between items-center text-[11px] text-muted font-black uppercase tracking-widest opacity-40">
+                <span className="flex items-center gap-3"><TagIcon size={14} /> {template.content.length} CH</span>
+                <span>Registrado em {new Date(template.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
           ))
