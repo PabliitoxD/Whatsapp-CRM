@@ -153,7 +153,7 @@ const Settings = () => {
               <h3 className="card-title flex items-center gap-3"><Globe size={22} className="text-primary" /> API & Webhooks</h3>
             </div>
             <p className="text-muted text-base leading-relaxed mb-8">Sincronize seus disparos com RD Station, HubSpot ou ActiveCampaign em tempo real.</p>
-            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%', py: '1.25rem' }}>
+            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%', paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
               <span className="opacity-40 font-black uppercase tracking-widest text-xs">Configurações Avançadas (Em breve)</span>
             </button>
           </div>
@@ -163,7 +163,7 @@ const Settings = () => {
               <h3 className="card-title flex items-center gap-3"><Lock size={22} className="text-primary" /> Segurança</h3>
             </div>
             <p className="text-muted text-base leading-relaxed mb-8">Gerencie permissões de usuários e ative a autenticação de dois fatores (2FA).</p>
-            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%', py: '1.25rem' }}>
+            <button className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', width: '100%', paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
               <span className="opacity-40 font-black uppercase tracking-widest text-xs">Módulos de Acesso (Em breve)</span>
             </button>
           </div>
