@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Users, Upload, Trash2, Search, Plus, Tag, X, CheckCircle2, Database } from 'lucide-react';
+import { Users, Upload, Trash2, Search, Plus, Tag, X, CheckCircle2, Database, Download } from 'lucide-react';
 import { useContacts } from '../../lib/ContactContext';
 import { PageHeader, UICard, UIButton } from '../../components/UIComponents';
 
@@ -58,6 +58,18 @@ const Contacts = () => {
     setNewTag('');
   };
 
+  const downloadTemplate = () => {
+    const csvContent = "nome,telefone\nJoao Silva,5511999999999\nMaria Santos,5511888888888";
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "modelo_importacao_crm.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredContacts = contacts.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.phone.includes(searchTerm)
@@ -69,6 +81,9 @@ const Contacts = () => {
         title="Audiência Master" 
         subtitle="Gestão estratégica de leads e variáveis de personalização em massa."
       >
+        <UIButton variant="secondary" onClick={downloadTemplate} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+          <Download size={18} /> Baixar Modelo
+        </UIButton>
         <UIButton variant="danger" onClick={clearContacts}>
           <Trash2 size={18} /> Limpar Base
         </UIButton>
