@@ -11,9 +11,25 @@ const handle = app.getRequestHandler();
 
 const clients = new Map();
 
+const logs = [];
+const addLog = (msg) => {
+  const entry = `[${new Date().toISOString()}] ${msg}`;
+  console.log(entry);
+  logs.push(entry);
+  if (logs.length > 100) logs.shift();
+};
+
 app.prepare().then(() => {
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
+    
+    // Endpoint de depuração remota
+    if (parsedUrl.pathname === '/api/debug-server') {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ logs, instances: Array.from(clients.keys()) }));
+      return;
+    }
+
     handle(req, res, parsedUrl);
   });
 
@@ -32,61 +48,72 @@ app.prepare().then(() => {
       return;
     }
 
-    console.log(`[Unified Server] Creating instance: ${instanceId}`);
+    addLog(`Iniciando criação da instância: ${instanceId}`);
     
-    const client = new Client({
-      authStrategy: new LocalAuth({
-        clientId: instanceId,
-        dataPath: `./.wwebjs_auth/session-${instanceId}`
-      }),
-      puppeteer: {
-        headless: true,
-        executablePath: process.env.NODE_ENV === 'production' ? '/usr/bin/chromium' : undefined,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--single-process',
-          '--disable-gpu'
-        ],
-      }
-    });
+    try {
+      const client = new Client({
+        authStrategy: new LocalAuth({
+          clientId: instanceId,
+          dataPath: `./.wwebjs_auth/session-${instanceId}`
+        }),
+        puppeteer: {
+          headless: true,
+          executablePath: process.env.NODE_ENV === 'production' ? '/usr/bin/chromium' : undefined,
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
+          ],
+        }
+      });
 
-    const instanceData = {
-      client,
-      status: 'connecting',
-      id: instanceId
-    };
+      const instanceData = {
+        client,
+        status: 'connecting',
+        id: instanceId
+      };
 
-    clients.set(instanceId, instanceData);
-    io.emit('instance-status', { id: instanceId, status: 'connecting' });
+      clients.set(instanceId, instanceData);
+      io.emit('instance-status', { id: instanceId, status: 'connecting' });
 
-    client.on('qr', async (qr) => {
-      console.log(`[Unified Server] QR RECEIVED for ${instanceId}`);
-      try {
-        const qrDataURL = await QRCode.toDataURL(qr);
-        io.emit('instance-qr', { id: instanceId, qr: qrDataURL });
-      } catch (err) {
-        console.error('QR Generation error:', err);
-      }
-    });
+      client.on('qr', async (qr) => {
+        addLog(`QR Code recebido para ${instanceId}`);
+        try {
+          const qrDataURL = await QRCode.toDataURL(qr);
+          io.emit('instance-qr', { id: instanceId, qr: qrDataURL });
+        } catch (err) {
+          addLog(`Erro ao gerar imagem do QR: ${err.message}`);
+        }
+      });
 
-    client.on('ready', () => {
-      console.log(`[Unified Server] Client ${instanceId} is ready!`);
-      instanceData.status = 'connected';
-      io.emit('instance-status', { id: instanceId, status: 'connected' });
-    });
+      client.on('ready', () => {
+        addLog(`Instância ${instanceId} está PRONTA!`);
+        instanceData.status = 'connected';
+        io.emit('instance-status', { id: instanceId, status: 'connected' });
+      });
 
-    client.on('disconnected', (reason) => {
-      console.log(`[Unified Server] Client ${instanceId} disconnected`, reason);
-      instanceData.status = 'disconnected';
-      io.emit('instance-status', { id: instanceId, status: 'disconnected' });
-    });
+      client.on('auth_failure', (msg) => {
+        addLog(`Falha na autenticação para ${instanceId}: ${msg}`);
+      });
 
-    client.initialize().catch(err => console.error(`[Unified Server] Init error:`, err));
+      client.on('disconnected', (reason) => {
+        addLog(`Instância ${instanceId} desconectada: ${reason}`);
+        instanceData.status = 'disconnected';
+        io.emit('instance-status', { id: instanceId, status: 'disconnected' });
+      });
+
+      addLog(`Chamando client.initialize() para ${instanceId}...`);
+      client.initialize().catch(err => {
+        addLog(`ERRO CRÍTICO no initialize de ${instanceId}: ${err.message}`);
+      });
+    } catch (outerErr) {
+      addLog(`ERRO ao criar objeto Client: ${outerErr.message}`);
+    }
   };
 
   io.on('connection', (socket) => {
