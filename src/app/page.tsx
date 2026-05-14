@@ -117,7 +117,7 @@ const Dashboard = () => {
               <span>Fluxo de Campanhas</span>
             </h3>
           </div>
-          <div style={{ padding: '3rem' }} className="space-y-8 overflow-y-auto pr-4" style={{ maxHeight: '700px', padding: '3rem' }}>
+          <div className="space-y-8 overflow-y-auto pr-4" style={{ maxHeight: '700px', padding: '3rem' }}>
             {campaigns.length === 0 ? (
               <p className="text-muted text-center py-20 italic text-lg opacity-30">Aguardando início do primeiro disparo estratégico.</p>
             ) : (
