@@ -212,9 +212,51 @@ td {
 .space-y-8 > * + * { margin-top: 2rem; }
 .space-y-12 > * + * { margin-top: 3rem; }
 
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out;
+/* MODAIS E OVERLAYS */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-out;
 }
+
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.card-icon-box {
+  width: 48px;
+  height: 48px;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.card-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* UTILITÁRIOS EXTRAS */
+.text-primary { color: var(--primary); }
+.text-success { color: var(--success); }
+.text-error { color: var(--error); }
+.text-muted { color: var(--text-muted); }
+.font-black { font-weight: 900; }
+.tracking-widest { letter-spacing: 0.15em; }
+.tracking-tight { letter-spacing: -0.04em; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

@@ -27,9 +27,28 @@ const Templates = () => {
     setShowModal(false);
   };
 
-  // Atalho para inserir {{tag}} no meio do texto da mensagem
+  // Atalho para inserir {{tag}} na posição atual do cursor no textarea
   const insertTag = (tag: string) => {
-    setNewContent(prev => prev + `{{${tag}}}`);
+    const textarea = document.getElementById('template-content') as HTMLTextAreaElement;
+    if (!textarea) {
+      setNewContent(prev => prev + `{{${tag}}}`);
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = newContent;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+    
+    setNewContent(before + `{{${tag}}}` + after);
+    
+    // Devolve o foco ao textarea após a inserção
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + tag.length + 4;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 10);
   };
 
   return (
@@ -75,6 +94,7 @@ const Templates = () => {
                 <div className="input-group">
                   <label>Conteúdo da Mensagem</label>
                   <textarea 
+                    id="template-content"
                     rows={8}
                     placeholder="Digite sua mensagem estratégica..." 
                     style={{ fontSize: '1.1rem', lineHeight: '1.6' }}

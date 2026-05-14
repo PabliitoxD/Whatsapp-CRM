@@ -46,11 +46,21 @@ const Dashboard = () => {
       />
 
       {/* Grid de Estatísticas: 4 colunas com cards de métricas rápidas */}
-      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', marginBottom: '4rem' }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', marginBottom: '2.5rem' }}>
         <StatCard label="Base Total" value={contacts.length} icon={Users} />
         <StatCard label="Entregues" value={totalSent} icon={Send} color="var(--success)" />
         <StatCard label="Falhas" value={totalErrors} icon={AlertCircle} color="var(--error)" />
         <StatCard label="Instâncias" value={instances.filter(i => i.status === 'connected').length} icon={Smartphone} />
+      </div>
+
+      {/* Ações Rápidas: Acesso imediato às funções principais solicitadas */}
+      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '4rem' }}>
+        <UIButton onClick={() => window.location.href = '/templates'} style={{ flex: 1, height: '80px', fontSize: '1rem' }}>
+          <Plus size={20} /> Criar Novo Template
+        </UIButton>
+        <UIButton onClick={() => window.location.href = '/settings'} style={{ flex: 1, height: '80px', fontSize: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}>
+          <Plus size={20} /> Adicionar Nova Instância
+        </UIButton>
       </div>
 
       {/* Área Principal: Monitor de Aparelhos e Performance */}

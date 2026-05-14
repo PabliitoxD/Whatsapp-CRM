@@ -147,24 +147,36 @@ const Campaigns = () => {
 
             <div className="input-group">
               <label>Caminho de Saída (Aparelho)</label>
-              <select value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
-                <option value="">Selecione um aparelho conectado...</option>
-                {instances.map(i => (
-                  <option key={i.id} value={i.id} disabled={i.status !== 'connected'}>
-                    {i.name} ({i.status === 'connected' ? 'ONLINE' : 'OFFLINE'})
-                  </option>
-                ))}
-              </select>
+              {instances.length === 0 ? (
+                <UIButton onClick={() => window.location.href = '/settings'} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  Nenhum aparelho cadastrado. Adicionar?
+                </UIButton>
+              ) : (
+                <select value={selectedInstanceId} onChange={(e) => setSelectedInstanceId(e.target.value)}>
+                  <option value="">Selecione um aparelho conectado...</option>
+                  {instances.map(i => (
+                    <option key={i.id} value={i.id} disabled={i.status !== 'connected'}>
+                      {i.name} ({i.status === 'connected' ? 'ONLINE' : 'OFFLINE'})
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className="input-group">
               <label>Engenharia de Mensagem (Modelo)</label>
-              <select value={selectedTemplateId} onChange={(e) => setSelectedTemplateId(e.target.value)}>
-                <option value="">Selecione um modelo estratégico...</option>
-                {templates.map(t => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
+              {templates.length === 0 ? (
+                <UIButton onClick={() => window.location.href = '/templates'} style={{ width: '100%', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                  Nenhum modelo cadastrado. Criar agora?
+                </UIButton>
+              ) : (
+                <select value={selectedTemplateId} onChange={(e) => setSelectedTemplateId(e.target.value)}>
+                  <option value="">Selecione um modelo estratégico...</option>
+                  {templates.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className="input-group">

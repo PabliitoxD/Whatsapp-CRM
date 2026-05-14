@@ -71,19 +71,42 @@ const Settings = () => {
         {/* COLUNA ESQUERDA: GESTÃO DE INSTÂNCIAS (APARELHOS) */}
         <UICard title="Aparelhos Conectados" icon={Smartphone}>
           <div className="space-y-8">
-            {/* Bloco condicional para adição de nova instância */}
-            {isAdding && (
-              <div className="p-8 bg-primary/5 border border-primary/20 rounded-3xl mb-10 animate-fade-in">
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-[10px] font-black uppercase text-primary tracking-widest">Identificação do Aparelho</span>
-                  <button onClick={() => setIsAdding(false)} className="text-muted hover:text-white transition-all"><X size={20} /></button>
+      {/* MODAL DE ADIÇÃO DE INSTÂNCIA */}
+      {isAdding && (
+        <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 1000 }}>
+          <div className="card" style={{ width: '100%', maxWidth: '600px', boxShadow: '0 50px 100px rgba(0,0,0,0.8)' }}>
+            <div className="card-header-unified" style={{ padding: '2.5rem 3.5rem' }}>
+              <div className="card-title-group">
+                <div className="card-icon-box"><Smartphone size={22} /></div>
+                <h3>Novo Aparelho Estratégico</h3>
+              </div>
+              <button onClick={() => setIsAdding(false)} className="text-muted hover:text-white transition-all">
+                <X size={28} />
+              </button>
+            </div>
+
+            <div className="card-inner" style={{ padding: '3.5rem' }}>
+              <div className="space-y-8">
+                <div className="input-group">
+                  <label>Identificação do Aparelho</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ex: Suporte Comercial 01" 
+                    value={newName} 
+                    onChange={(e) => setNewName(e.target.value)} 
+                    autoFocus
+                  />
                 </div>
-                <div className="flex gap-4">
-                  <input type="text" placeholder="Ex: Suporte Comercial 01" value={newName} onChange={(e) => setNewName(e.target.value)} />
-                  <UIButton onClick={handleAdd} style={{ padding: '0 1.5rem' }}><Plus size={24} /></UIButton>
+
+                <div className="flex justify-end gap-4 pt-8 border-t border-white/5">
+                  <UIButton variant="danger" onClick={() => setIsAdding(false)} style={{ background: 'transparent' }}>Cancelar</UIButton>
+                  <UIButton onClick={handleAdd} style={{ padding: '1.25rem 3rem' }}>Criar Instância</UIButton>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        </div>
+      )}
 
             {instances.length === 0 ? (
               <div className="empty-state py-20">
