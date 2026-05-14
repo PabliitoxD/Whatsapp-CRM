@@ -18,6 +18,7 @@ app.prepare().then(() => {
   });
 
   const io = new Server(server, {
+    path: '/socket.io-custom',
     cors: {
       origin: "*",
       methods: ["GET", "POST"]

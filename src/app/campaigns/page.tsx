@@ -41,7 +41,7 @@ const Campaigns = () => {
 
   // Conexão com o servidor de sockets para status em tempo real
   useEffect(() => {
-    const newSocket = io();
+    const newSocket = io({ path: '/socket.io-custom' });
     setSocket(newSocket);
 
     // Quando uma mensagem é disparada com sucesso ou falha

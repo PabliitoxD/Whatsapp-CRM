@@ -29,7 +29,7 @@ const Settings = () => {
 
   // Monitoramento de Sockets para QR Code e Status de Conexão
   useEffect(() => {
-    const newSocket = io();
+    const newSocket = io({ path: '/socket.io-custom' });
     setSocket(newSocket);
 
     // Recebe o QR Code gerado pelo backend
