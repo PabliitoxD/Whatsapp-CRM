@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 /**
@@ -10,7 +12,7 @@ import React from 'react';
 
 // 1. HEADER DA PÁGINA (Título principal e botões de ação do topo)
 export const PageHeader = ({ title, subtitle, children }: { title: string, subtitle: string, children?: React.ReactNode }) => (
-  <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem', paddingBottom: '2.5rem', borderBottom: '1px solid var(--border)' }}>
+  <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem', paddingBottom: '2.5rem', borderBottom: '1px solid var(--border)', position: 'relative', zIndex: 10 }}>
     <div style={{ flex: 1 }}>
       <h1 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '-0.04em', margin: 0, lineHeight: 1 }}>{title}</h1>
       <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '1rem', fontWeight: 500 }}>{subtitle}</p>
@@ -60,6 +62,7 @@ export const UIButton = ({ children, onClick, variant = 'primary', style = {} }:
   const isDanger = variant === 'danger';
   return (
     <button 
+      type="button"
       onClick={onClick}
       className="btn-primary"
       style={{ 

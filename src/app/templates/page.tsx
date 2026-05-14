@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageSquare, Plus, Trash2, X, FileText, Tag as TagIcon } from 'lucide-react';
 import { useContacts } from '../../lib/ContactContext';
 import { PageHeader, UICard, UIButton } from '../../components/UIComponents';
@@ -19,7 +19,7 @@ const Templates = () => {
   const [newContent, setNewContent] = useState('');
 
   // Auto-abre o modal se vier redirecionado com o parâmetro 'new'
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('new') === 'true') {
       setShowModal(true);
@@ -38,8 +38,10 @@ const Templates = () => {
   // Atalho para inserir {{tag}} na posição atual do cursor no textarea
   const insertTag = (tag: string) => {
     const textarea = document.getElementById('template-content') as HTMLTextAreaElement;
+    const tagToInsert = `{{${tag}}}`;
+    
     if (!textarea) {
-      setNewContent(prev => prev + `{{${tag}}}`);
+      setNewContent(prev => prev + tagToInsert);
       return;
     }
 
@@ -49,14 +51,15 @@ const Templates = () => {
     const before = text.substring(0, start);
     const after = text.substring(end, text.length);
     
-    setNewContent(before + `{{${tag}}}` + after);
+    const updatedContent = before + tagToInsert + after;
+    setNewContent(updatedContent);
     
-    // Devolve o foco ao textarea após a inserção
+    // Devolve o foco ao textarea após a inserção e posiciona o cursor após a tag
+    textarea.focus();
     setTimeout(() => {
-      textarea.focus();
-      const newPos = start + tag.length + 4;
+      const newPos = start + tagToInsert.length;
       textarea.setSelectionRange(newPos, newPos);
-    }, 10);
+    }, 0);
   };
 
   return (
@@ -89,12 +92,13 @@ const Templates = () => {
               <div className="space-y-8">
                 {/* Nome do Template */}
                 <div className="input-group">
-                  <label>Identificação do Modelo</label>
+                  <label style={{ color: !newName && showModal ? 'var(--text-muted)' : '' }}>Identificação do Modelo</label>
                   <input 
                     type="text" 
                     placeholder="Ex: Recuperação de Carrinho Abandonado" 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
+                    style={{ borderColor: !newName && showModal ? 'rgba(255,255,255,0.05)' : '' }}
                   />
                 </div>
 
@@ -105,7 +109,7 @@ const Templates = () => {
                     id="template-content"
                     rows={8}
                     placeholder="Digite sua mensagem estratégica..." 
-                    style={{ fontSize: '1.1rem', lineHeight: '1.6' }}
+                    style={{ fontSize: '1.1rem', lineHeight: '1.6', borderColor: !newContent && showModal ? 'rgba(255,255,255,0.05)' : '' }}
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
                   />
@@ -113,11 +117,15 @@ const Templates = () => {
 
                 {/* Seleção de Variáveis (Tags) */}
                 <div>
-                  <p className="text-[10px] font-black uppercase text-muted tracking-widest mb-4">Inserir Variáveis Dinâmicas</p>
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-[10px] font-black uppercase text-muted tracking-widest">Inserir Variáveis Dinâmicas</p>
+                    <span className="text-[10px] text-primary opacity-50 font-bold">CLIQUE PARA INSERIR</span>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {customTags.map((tag) => (
                       <button 
                         key={tag}
+                        type="button"
                         onClick={() => insertTag(tag)}
                         className="px-4 py-2.5 bg-black/40 rounded-xl border border-white/5 text-xs font-black text-primary hover:bg-primary hover:text-white transition-all"
                       >
@@ -129,8 +137,17 @@ const Templates = () => {
 
                 {/* Botões de Ação do Modal */}
                 <div className="flex justify-end gap-4 pt-8 border-t border-white/5">
-                  <UIButton variant="danger" onClick={() => setShowModal(false)} style={{ background: 'transparent' }}>Cancelar</UIButton>
-                  <UIButton onClick={handleSave} style={{ padding: '1.25rem 3rem' }}>Salvar Modelo</UIButton>
+                  <UIButton variant="danger" onClick={() => { setShowModal(false); setNewName(''); setNewContent(''); }} style={{ background: 'transparent' }}>Cancelar</UIButton>
+                  <UIButton 
+                    onClick={handleSave} 
+                    style={{ 
+                      padding: '1.25rem 3rem',
+                      opacity: !newName || !newContent ? 0.5 : 1,
+                      cursor: !newName || !newContent ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    Salvar Modelo
+                  </UIButton>
                 </div>
               </div>
             </div>
