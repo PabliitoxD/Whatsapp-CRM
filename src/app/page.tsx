@@ -21,7 +21,11 @@ const Dashboard = () => {
 
   // Inicialização do Socket para monitoramento em tempo real das instâncias
   useEffect(() => {
-    const newSocket = io({ path: '/socket.io-custom' });
+    const newSocket = io({ 
+      path: '/socket.io-custom',
+      transports: ['polling', 'websocket'],
+      secure: true
+    });
     setSocket(newSocket);
 
     // Escuta atualizações de status vindas do backend
