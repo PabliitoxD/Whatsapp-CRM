@@ -117,9 +117,9 @@ const Templates = () => {
 
                 {/* Seleção de Variáveis (Tags) */}
                 <div>
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
                     <p className="text-[10px] font-black uppercase text-muted tracking-widest">Inserir Variáveis Dinâmicas</p>
-                    <span className="text-[10px] text-primary opacity-50 font-bold">CLIQUE PARA INSERIR</span>
+                    <span style={{ fontSize: '10px', color: 'var(--primary)', opacity: 0.5, fontWeight: 700 }}>CLIQUE PARA INSERIR</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {customTags.map((tag) => (
@@ -127,7 +127,19 @@ const Templates = () => {
                         key={tag}
                         type="button"
                         onClick={() => insertTag(tag)}
-                        className="px-4 py-2.5 bg-black/40 rounded-xl border border-white/5 text-xs font-black text-primary hover:bg-primary hover:text-white transition-all"
+                        style={{ 
+                          padding: '0.625rem 1rem',
+                          backgroundColor: 'rgba(0,0,0,0.4)',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(255,255,255,0.05)',
+                          fontSize: '0.75rem',
+                          fontWeight: 900,
+                          color: 'var(--primary)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s'
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--primary)'; e.currentTarget.style.color = 'white'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.4)'; e.currentTarget.style.color = 'var(--primary)'; }}
                       >
                         {'{'}{'{'}{tag}{'}'}{'}'}
                       </button>
@@ -136,7 +148,7 @@ const Templates = () => {
                 </div>
 
                 {/* Botões de Ação do Modal */}
-                <div className="flex justify-end gap-4 pt-8 border-t border-white/5">
+                <div className="flex justify-end gap-4" style={{ paddingTop: '2rem', borderTop: '1px solid var(--border)', marginTop: '2rem' }}>
                   <UIButton variant="danger" onClick={() => { setShowModal(false); setNewName(''); setNewContent(''); }} style={{ background: 'transparent' }}>Cancelar</UIButton>
                   <UIButton 
                     onClick={handleSave} 
@@ -158,9 +170,9 @@ const Templates = () => {
       {/* LISTAGEM DE MODELOS EM GRID (Cards) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '2.5rem' }}>
         {templates.length === 0 ? (
-          <div className="col-span-full">
+          <div style={{ gridColumn: '1 / -1' }}>
             <UICard title="Repositório de Estratégias" icon={FileText}>
-              <div className="empty-state py-20">
+              <div className="empty-state" style={{ padding: '5rem 0' }}>
                 <FileText size={64} className="empty-state-icon" />
                 <p className="font-black opacity-30">Nenhum modelo estratégico criado.</p>
               </div>
@@ -173,15 +185,15 @@ const Templates = () => {
                 title={template.name} 
                 icon={MessageSquare}
                 headerAction={
-                  <button onClick={() => deleteTemplate(template.id)} className="p-3 text-muted hover:text-error transition-all opacity-0 group-hover:opacity-100">
+                  <button onClick={() => deleteTemplate(template.id)} style={{ padding: '0.75rem', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>
                     <Trash2 size={20} />
                   </button>
                 }
               >
-                <div className="p-6 bg-black/20 rounded-2xl border border-white/5 text-base text-muted leading-relaxed min-h-[140px] font-medium">
+                <div style={{ padding: '1.5rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '20px', border: '1px solid var(--border)', fontSize: '1rem', color: 'var(--text-muted)', lineHeight: '1.6', minHeight: '140px', fontWeight: 500 }}>
                   {template.content}
                 </div>
-                <div className="mt-8 flex justify-between items-center text-[10px] text-muted font-black uppercase tracking-widest opacity-40">
+                <div className="flex justify-between items-center" style={{ marginTop: '2rem', fontSize: '10px', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', opacity: 0.4 }}>
                   <span>{template.content.length} caracteres</span>
                   <span>{new Date(template.createdAt).toLocaleDateString()}</span>
                 </div>

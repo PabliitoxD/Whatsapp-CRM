@@ -172,7 +172,7 @@ const Contacts = () => {
                   </tr>
                 ) : (
                   filteredContacts.map((contact) => (
-                    <tr key={contact.id} className="hover:bg-white/[0.01] transition-colors">
+                    <tr key={contact.id} style={{ transition: 'background-color 0.3s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.01)'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ paddingLeft: '3rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                           <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '0.9rem' }}>
@@ -189,7 +189,7 @@ const Contacts = () => {
                         </div>
                       </td>
                       <td style={{ textAlign: 'right', paddingRight: '3rem' }}>
-                        <button className="p-3 text-muted hover:text-error transition-all" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => deleteContact(contact.id)}>
+                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.75rem', color: 'var(--text-muted)', transition: 'color 0.3s' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--error)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-muted)'} onClick={() => deleteContact(contact.id)}>
                           <Trash2 size={20} />
                         </button>
                       </td>

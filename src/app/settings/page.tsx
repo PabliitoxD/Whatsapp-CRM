@@ -29,7 +29,12 @@ const Settings = () => {
 
   // Monitoramento de Sockets para QR Code e Status de Conexão
   useEffect(() => {
-    const newSocket = io('http://localhost:3001');
+    // Determina a URL do socket dinamicamente para funcionar tanto local quanto remoto
+    const socketUrl = typeof window !== 'undefined' 
+      ? `${window.location.protocol}//${window.location.hostname}:3001` 
+      : 'http://localhost:3001';
+      
+    const newSocket = io(socketUrl);
     setSocket(newSocket);
 
     // Recebe o QR Code gerado pelo backend
@@ -79,7 +84,7 @@ const Settings = () => {
       <div className="grid-2">
         {/* COLUNA ESQUERDA: GESTÃO DE INSTÂNCIAS (APARELHOS) */}
         <UICard title="Aparelhos Conectados" icon={Smartphone}>
-          <div className="space-y-8">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* MODAL DE ADIÇÃO DE INSTÂNCIA */}
       {isAdding && (
         <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 1000 }}>
@@ -107,7 +112,7 @@ const Settings = () => {
                   />
                 </div>
 
-                <div className="flex justify-end gap-4 pt-8 border-t border-white/5">
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>
                   <UIButton variant="danger" onClick={() => setIsAdding(false)} style={{ background: 'transparent' }}>Cancelar</UIButton>
                   <UIButton onClick={handleAdd} style={{ padding: '1.25rem 3rem' }}>Criar Instância</UIButton>
                 </div>
@@ -118,49 +123,49 @@ const Settings = () => {
       )}
 
             {instances.length === 0 ? (
-              <div className="empty-state py-20">
+              <div className="empty-state" style={{ padding: '5rem 0' }}>
                 <Smartphone size={56} className="empty-state-icon" />
                 <p className="font-black opacity-30">Sem instâncias cadastradas.</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 {instances.map((instance) => (
-                  <div key={instance.id} className="p-8 bg-black/20 rounded-[32px] border border-white/5 group">
-                    <div className="flex justify-between items-center mb-10">
-                      <div className="flex items-center gap-5">
+                  <div key={instance.id} style={{ padding: '2rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid var(--border)', position: 'relative' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                         <div className="card-icon-box"><Smartphone size={20} /></div>
                         <div>
-                          <span className="font-black text-xl tracking-tight block">{instance.name}</span>
-                          <span className="text-[9px] font-black uppercase text-muted tracking-widest mt-1">UUID: {instance.id.slice(0,8)}</span>
+                          <span style={{ fontWeight: 900, fontSize: '1.25rem', letterSpacing: '-0.02em', display: 'block' }}>{instance.name}</span>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.15em', marginTop: '0.25rem', display: 'block' }}>UUID: {instance.id.slice(0,8)}</span>
                         </div>
                       </div>
-                      <button onClick={() => handleDelete(instance.id)} className="p-3 text-muted hover:text-error transition-all opacity-0 group-hover:opacity-100">
+                      <button onClick={() => handleDelete(instance.id)} style={{ padding: '0.75rem', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }} className="hover:text-error">
                         <Trash2 size={20} />
                       </button>
                     </div>
 
                     {/* Lógica de Status e QR Code Centralizada */}
-                    <div className="flex flex-col items-center py-10 bg-black/40 rounded-3xl border border-white/5">
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2.5rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '20px', border: '1px solid var(--border)' }}>
                       {instance.status === 'connected' ? (
-                        <div className="text-center">
-                          <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mb-6 mx-auto border border-success/20">
-                            <CheckCircle size={40} className="text-success" />
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ width: '80px', height: '80px', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', margin: '0 auto', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                            <CheckCircle size={40} style={{ color: 'var(--success)' }} />
                           </div>
-                          <p className="font-black text-success uppercase text-sm tracking-[0.2em]">Conectado</p>
+                          <p style={{ fontWeight: 900, color: 'var(--success)', textTransform: 'uppercase', fontSize: '0.875rem', letterSpacing: '0.2em' }}>Conectado</p>
                         </div>
                       ) : instance.qrCode ? (
-                        <div className="text-center">
-                          <div className="bg-white p-4 rounded-3xl inline-block mb-6 shadow-[0_0_50px_rgba(255,255,255,0.1)]">
-                            <img src={instance.qrCode} alt="QR Code de Conexão" className="w-48 h-48" />
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ background: 'white', padding: '1rem', borderRadius: '24px', display: 'inline-block', marginBottom: '1.5rem', boxShadow: '0 0 50px rgba(255,255,255,0.05)' }}>
+                            <img src={instance.qrCode} alt="QR Code de Conexão" style={{ width: '192px', height: '192px' }} />
                           </div>
-                          <p className="text-[10px] text-muted font-black uppercase tracking-[0.2em]">Escaneie para Conectar</p>
+                          <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em' }}>Escaneie para Conectar</p>
                         </div>
                       ) : (
-                        <div className="text-center w-full px-10">
+                        <div style={{ textAlign: 'center', width: '100%' }}>
                           {instance.status === 'connecting' ? (
-                            <div className="flex flex-col items-center">
-                              <Loader2 className="animate-spin text-primary mb-6" size={40} />
-                              <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em]">Sincronizando Core...</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <div className="loader-spin" style={{ width: '40px', height: '40px', border: '3px solid rgba(139, 92, 246, 0.1)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '1.5rem' }}></div>
+                              <p style={{ fontSize: '0.625rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Sincronizando Core...</p>
                             </div>
                           ) : (
                             <UIButton onClick={() => connectInstance(instance.id)} style={{ width: '100%', height: '64px' }}>

@@ -40,7 +40,11 @@ const Campaigns = () => {
 
   // Conexão com o servidor de sockets para status em tempo real
   useEffect(() => {
-    const newSocket = io('http://localhost:3001');
+    const socketUrl = typeof window !== 'undefined' 
+      ? `${window.location.protocol}//${window.location.hostname}:3001` 
+      : 'http://localhost:3001';
+      
+    const newSocket = io(socketUrl);
     setSocket(newSocket);
 
     // Quando uma mensagem é disparada com sucesso ou falha
@@ -192,18 +196,18 @@ const Campaigns = () => {
 
             {/* MONITOR DE PROGRESSO ATIVO */}
             {isRunning && (
-              <div className="mt-12 pt-10 border-t border-white/5">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-xs font-black text-muted uppercase tracking-widest">Progresso Real</span>
-                  <span className="text-primary font-black">{progress}%</span>
+              <div style={{ marginTop: '3rem', paddingTop: '2.5rem', borderTop: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Progresso Real</span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 900 }}>{progress}%</span>
                 </div>
-                <div className="w-full bg-black/40 h-3 rounded-full overflow-hidden border border-white/5">
-                  <div className="bg-primary h-full transition-all duration-500 shadow-[0_0_20px_rgba(139,92,246,0.4)]" style={{ width: `${progress}%` }} />
+                <div style={{ width: '100%', backgroundColor: 'rgba(0,0,0,0.4)', height: '12px', borderRadius: '999px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                  <div style={{ backgroundColor: 'var(--primary)', height: '100%', transition: 'all 0.5s ease', width: `${progress}%`, boxShadow: '0 0 20px rgba(139,92,246,0.4)' }} />
                 </div>
                 
                 {/* LOG DE OPERAÇÕES */}
-                <div className="mt-8 p-6 bg-black/60 rounded-2xl border border-white/5 font-mono text-xs h-48 overflow-y-auto leading-loose text-muted">
-                  {logs.map((log, i) => <div key={i} className={log.includes('✅') ? 'text-success/80' : log.includes('❌') ? 'text-error/80' : ''}>{log}</div>)}
+                <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: '16px', border: '1px solid var(--border)', fontFamily: 'monospace', fontSize: '0.75rem', height: '192px', overflowY: 'auto', lineHeight: '1.8', color: 'var(--text-muted)' }}>
+                  {logs.map((log, i) => <div key={i} style={{ color: log.includes('✅') ? 'rgba(16, 185, 129, 0.8)' : log.includes('❌') ? 'rgba(239, 68, 68, 0.8)' : '' }}>{log}</div>)}
                 </div>
               </div>
             )}
@@ -218,34 +222,60 @@ const Campaigns = () => {
               <p className="font-black opacity-30">Nenhuma campanha realizada ainda.</p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {campaigns.map((camp) => (
-                <div key={camp.id} className="p-8 bg-black/20 rounded-[28px] border border-white/5">
-                  <div className="flex justify-between items-center mb-8">
-                    <span className="text-xl font-black">{camp.name}</span>
-                    <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest ${camp.status === 'Rodando' ? 'bg-primary/20 text-primary animate-pulse' : 'bg-success/10 text-success'}`}>
+                <div key={camp.id} style={{ padding: '2rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 900 }}>{camp.name}</span>
+                    <span style={{ fontSize: '0.625rem', fontWeight: 900, padding: '0.5rem 1rem', borderRadius: '99px', textTransform: 'uppercase', letterSpacing: '0.1em', background: camp.status === 'Rodando' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(16, 185, 129, 0.1)', color: camp.status === 'Rodando' ? 'var(--primary)' : 'var(--success)' }}>
                       {camp.status}
                     </span>
                   </div>
                   {/* Grid de métricas da campanha */}
-                  <div className="grid grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <p className="text-[10px] text-muted uppercase font-black mb-3">Entregues</p>
-                      <p className="text-3xl font-black text-success">{camp.success}</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 900, marginBottom: '0.75rem' }}>Entregues</p>
+                      <p style={{ fontSize: '1.875rem', fontWeight: 900, color: 'var(--success)' }}>{camp.success}</p>
                     </div>
-                    <div className="text-center border-l border-white/5">
-                      <p className="text-[10px] text-muted uppercase font-black mb-3">Falhas</p>
-                      <p className="text-3xl font-black text-error">{camp.error}</p>
+                    <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
+                      <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 900, marginBottom: '0.75rem' }}>Falhas</p>
+                      <p style={{ fontSize: '1.875rem', fontWeight: 900, color: 'var(--error)' }}>{camp.error}</p>
                     </div>
-                    <div className="text-center border-l border-white/5">
-                      <p className="text-[10px] text-muted uppercase font-black mb-3">Leads</p>
-                      <p className="text-3xl font-black">{camp.total}</p>
+                    <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
+                      <p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 900, marginBottom: '0.75rem' }}>Leads</p>
+                      <p style={{ fontSize: '1.875rem', fontWeight: 900 }}>{camp.total}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
+          <div style={{ marginTop: '3rem' }}>
+            <p style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.15em', marginBottom: '1.5rem', opacity: 0.5 }}>Variáveis Ativas no Sistema</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {customTags.map((tag) => (
+                /* TAG ITEM: Forçado em linha horizontal única */
+                <div key={tag} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '32px', height: '32px', backgroundColor: 'rgba(139, 92, 246, 0.1)', color: 'var(--primary)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 900 }}>
+                      {'{'}{'{'}
+                    </div>
+                    <span style={{ fontWeight: 700, fontSize: '1rem', whiteSpace: 'nowrap' }}>{tag}</span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {tag !== 'nome' && tag !== 'telefone' ? (
+                      <button onClick={() => deleteCustomTag(tag)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.5rem' }}>
+                        <X size={16} />
+                      </button>
+                    ) : (
+                      <CheckCircle2 size={18} style={{ color: 'var(--success)', opacity: 0.6 }} />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </UICard>
       </div>
     </div>
