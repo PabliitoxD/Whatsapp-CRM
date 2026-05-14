@@ -1,15 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
+/**
+ * SISTEMA DE DESIGN - WHATSAPP CRM MASTER
+ * 
+ * Este CSS foi reconstruído para garantir alinhamento milimétrico 
+ * e uma estética de software SaaS de alto nível (Ultra Premium).
+ */
+
 :root {
   --background: #09090b;
   --sidebar-bg: #111114;
   --card-bg: #16161a;
-  --border: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
   --primary: #8b5cf6;
   --primary-hover: #7c3aed;
   --text-main: #ffffff;
   --text-muted: #a1a1aa;
-  --sidebar-width: 280px;
+  --sidebar-width: 300px;
   --success: #10b981;
   --error: #ef4444;
 }
@@ -27,127 +34,19 @@ body {
   min-height: 100vh;
 }
 
+/* LAYOUT PRINCIPAL: Sidebar fixa e Conteúdo fluido */
+.app-container {
+  display: flex;
+}
+
 .main-content {
   margin-left: var(--sidebar-width);
-  padding: 4rem 5rem; /* Espaçamento luxuoso mas funcional */
+  padding: 5rem 6rem; /* Espaçamento Premium equilibrado */
+  flex: 1;
   min-height: 100vh;
 }
 
-/* --- COMPONENTES PADRONIZADOS --- */
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.page-header h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.card-inner {
-  padding: 3rem; /* Espaço generoso */
-}
-
-.card-header-unified {
-  padding: 1.75rem 3rem;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.01);
-}
-
-.card-title-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.card-title-group h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.card-icon-box {
-  width: 48px;
-  height: 48px;
-  background: rgba(139, 92, 246, 0.1);
-  color: var(--primary);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(139, 92, 246, 0.1);
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 1.1rem 2.2rem;
-  border-radius: 14px;
-  font-weight: 800;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.btn-primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-}
-
-.input-group label {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-input, select, textarea {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.1rem 1.5rem;
-  color: white;
-  font-size: 1rem;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1.6fr;
-  gap: 3rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-  margin-bottom: 4rem;
-}
-
-/* Sidebar */
+/* SIDEBAR: Menu lateral perfeitamente alinhado */
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
@@ -156,29 +55,168 @@ input, select, textarea {
   top: 0;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
-  padding: 3rem 1.5rem;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
   z-index: 100;
 }
 
 .nav-item {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  margin-bottom: 0.5rem;
-  border-radius: 12px;
+  align-items: center; /* Alinhamento vertical centralizado */
+  gap: 1.25rem;
+  padding: 1.25rem 1.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 16px;
   color: var(--text-muted);
-  text-decoration: none;
   font-weight: 600;
-  transition: all 0.2s;
+  font-size: 1.05rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-item:hover, .nav-item.active {
-  background: rgba(255, 255, 255, 0.04);
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.03);
   color: white;
 }
 
 .nav-item.active {
   background: var(--primary);
   color: white;
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+}
+
+/* CARDS: Containers de informação modularizados */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s;
+}
+
+.card:hover {
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* COMPONENTES DE FORMULÁRIO */
+.input-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+input, select, textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.25rem 1.75rem;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input:focus {
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+/* BOTÕES */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.25rem 2.5rem;
+  border-radius: 18px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+}
+
+/* TABELAS PADRONIZADAS */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 2rem 2.5rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 2.25rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* GRIDS E ESTADOS VAZIOS */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 3.5rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.empty-state-icon {
+  color: var(--text-muted);
+  opacity: 0.15;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* UTILITÁRIOS */
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.space-y-8 > * + * { margin-top: 2rem; }
+.space-y-12 > * + * { margin-top: 3rem; }
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

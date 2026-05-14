@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  MessageSquare, 
-  Plus, 
-  Trash2, 
-  X,
-  FileText,
-  Copy,
-  Tag as TagIcon
-} from 'lucide-react';
+import { MessageSquare, Plus, Trash2, X, FileText, Tag as TagIcon } from 'lucide-react';
 import { useContacts } from '../../lib/ContactContext';
+import { PageHeader, UICard, UIButton } from '../../components/UIComponents';
+
+/**
+ * PÁGINA: MODELOS (TEMPLATES DE MENSAGEM)
+ * 
+ * Permite a criação e exclusão de modelos de mensagens estratégicas.
+ * Inclui um modal de criação com inserção dinâmica de variáveis (Tags).
+ */
 
 const Templates = () => {
   const { templates, addTemplate, deleteTemplate, customTags } = useContacts();
@@ -18,6 +18,7 @@ const Templates = () => {
   const [newName, setNewName] = useState('');
   const [newContent, setNewContent] = useState('');
 
+  // Salva o novo modelo e fecha o modal
   const handleSave = () => {
     if (!newName || !newContent) return;
     addTemplate({ name: newName, content: newContent });
@@ -26,116 +27,120 @@ const Templates = () => {
     setShowModal(false);
   };
 
+  // Atalho para inserir {{tag}} no meio do texto da mensagem
   const insertTag = (tag: string) => {
     setNewContent(prev => prev + `{{${tag}}}`);
   };
 
   return (
     <div className="templates-page">
-      <div className="page-header">
-        <div>
-          <h1>Modelos <span className="text-primary">Master</span></h1>
-          <p className="text-muted text-lg font-medium mt-2">Engenharia de mensagens para conversão em massa.</p>
-        </div>
-        <button className="btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={20} /> Criar Template
-        </button>
-      </div>
+      {/* Cabeçalho com botão de gatilho para o Modal */}
+      <PageHeader 
+        title="Modelos Master" 
+        subtitle="Engenharia de mensagens para conversão em massa e personalização."
+      >
+        <UIButton onClick={() => setShowModal(true)}>
+          <Plus size={20} /> Criar Novo Template
+        </UIButton>
+      </PageHeader>
 
-      {/* Modal de Criação */}
+      {/* MODAL DE CRIAÇÃO (Overlay fixo) */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '750px', padding: 0, overflow: 'hidden' }}>
-            <div className="card-header-unified">
+        <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 1000 }}>
+          <div className="card" style={{ width: '100%', maxWidth: '800px', boxShadow: '0 50px 100px rgba(0,0,0,0.8)' }}>
+            <div className="card-header-unified" style={{ padding: '2.5rem 3.5rem' }}>
               <div className="card-title-group">
-                <div className="card-icon-box"><MessageSquare size={20} /></div>
+                <div className="card-icon-box"><MessageSquare size={22} /></div>
                 <h3>Novo Modelo Estratégico</h3>
               </div>
               <button onClick={() => setShowModal(false)} className="text-muted hover:text-white transition-all">
-                <X size={24} />
+                <X size={28} />
               </button>
             </div>
 
-            <div className="card-inner space-y-8">
-              <div className="input-group">
-                <label>Identificação do Modelo</label>
-                <input 
-                  type="text" 
-                  placeholder="Ex: Recuperação de Carrinho" 
-                  className="mb-0"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Conteúdo da Mensagem</label>
-                <textarea 
-                  rows={6}
-                  placeholder="Olá {{nome}}, vimos que você esqueceu seus itens..." 
-                  value={newContent}
-                  style={{ fontSize: '1rem', lineHeight: '1.6', padding: '1.25rem' }}
-                  onChange={(e) => setNewContent(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 mb-4 text-[10px] font-black text-muted uppercase tracking-widest">
-                  <TagIcon size={12} className="text-primary" /> Inserir Variáveis
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {customTags.map((tag) => (
-                    <button 
-                      key={tag}
-                      onClick={() => insertTag(tag)}
-                      className="px-4 py-2 bg-black rounded-xl border border-white/5 text-xs font-black text-primary hover:bg-primary hover:text-white transition-all"
-                    >
-                      {'{'}{'{'}{tag}{'}'}{'}'}
-                    </button>
-                  ))}
+            <div className="card-inner" style={{ padding: '3.5rem' }}>
+              <div className="space-y-8">
+                {/* Nome do Template */}
+                <div className="input-group">
+                  <label>Identificação do Modelo</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ex: Recuperação de Carrinho Abandonado" 
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                  />
                 </div>
-              </div>
 
-              <div className="flex justify-end gap-4 pt-6 border-t border-white/5">
-                <button className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--border)' }} onClick={() => setShowModal(false)}>Cancelar</button>
-                <button className="btn-primary" onClick={handleSave}>Salvar Modelo</button>
+                {/* Área da Mensagem */}
+                <div className="input-group">
+                  <label>Conteúdo da Mensagem</label>
+                  <textarea 
+                    rows={8}
+                    placeholder="Digite sua mensagem estratégica..." 
+                    style={{ fontSize: '1.1rem', lineHeight: '1.6' }}
+                    value={newContent}
+                    onChange={(e) => setNewContent(e.target.value)}
+                  />
+                </div>
+
+                {/* Seleção de Variáveis (Tags) */}
+                <div>
+                  <p className="text-[10px] font-black uppercase text-muted tracking-widest mb-4">Inserir Variáveis Dinâmicas</p>
+                  <div className="flex flex-wrap gap-2">
+                    {customTags.map((tag) => (
+                      <button 
+                        key={tag}
+                        onClick={() => insertTag(tag)}
+                        className="px-4 py-2.5 bg-black/40 rounded-xl border border-white/5 text-xs font-black text-primary hover:bg-primary hover:text-white transition-all"
+                      >
+                        {'{'}{'{'}{tag}{'}'}{'}'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Botões de Ação do Modal */}
+                <div className="flex justify-end gap-4 pt-8 border-t border-white/5">
+                  <UIButton variant="danger" onClick={() => setShowModal(false)} style={{ background: 'transparent' }}>Cancelar</UIButton>
+                  <UIButton onClick={handleSave} style={{ padding: '1.25rem 3rem' }}>Salvar Modelo</UIButton>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '2rem' }}>
+      {/* LISTAGEM DE MODELOS EM GRID (Cards) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '2.5rem' }}>
         {templates.length === 0 ? (
-          <div className="card col-span-full">
-            <div className="empty-state py-20">
-              <FileText size={48} className="empty-state-icon" />
-              <p>Nenhum modelo criado</p>
-            </div>
+          <div className="col-span-full">
+            <UICard title="Repositório de Estratégias" icon={FileText}>
+              <div className="empty-state py-20">
+                <FileText size={64} className="empty-state-icon" />
+                <p className="font-black opacity-30">Nenhum modelo estratégico criado.</p>
+              </div>
+            </UICard>
           </div>
         ) : (
           templates.map((template) => (
-            <div key={template.id} className="card group">
-              <div className="card-header-unified">
-                <div className="card-title-group">
-                  <div className="card-icon-box"><MessageSquare size={18} /></div>
-                  <h3 className="text-base">{template.name}</h3>
-                </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                  <button onClick={() => deleteTemplate(template.id)} className="p-2 text-muted hover:text-error">
-                    <Trash2 size={16} />
+            <div key={template.id} className="group">
+              <UICard 
+                title={template.name} 
+                icon={MessageSquare}
+                headerAction={
+                  <button onClick={() => deleteTemplate(template.id)} className="p-3 text-muted hover:text-error transition-all opacity-0 group-hover:opacity-100">
+                    <Trash2 size={20} />
                   </button>
-                </div>
-              </div>
-              <div className="card-inner">
-                <div className="p-5 bg-black/20 rounded-xl border border-white/5 text-sm text-muted leading-relaxed font-medium min-h-[100px]">
+                }
+              >
+                <div className="p-6 bg-black/20 rounded-2xl border border-white/5 text-base text-muted leading-relaxed min-h-[140px] font-medium">
                   {template.content}
                 </div>
-                <div className="mt-6 flex justify-between items-center text-[10px] text-muted font-black uppercase opacity-40">
+                <div className="mt-8 flex justify-between items-center text-[10px] text-muted font-black uppercase tracking-widest opacity-40">
                   <span>{template.content.length} caracteres</span>
                   <span>{new Date(template.createdAt).toLocaleDateString()}</span>
                 </div>
-              </div>
+              </UICard>
             </div>
           ))
         )}
